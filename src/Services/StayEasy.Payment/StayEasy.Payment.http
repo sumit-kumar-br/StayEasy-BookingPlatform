@@ -1,0 +1,6 @@
+@StayEasy.Payment_HostAddress = http://localhost:5057
+
+GET {{StayEasy.Payment_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

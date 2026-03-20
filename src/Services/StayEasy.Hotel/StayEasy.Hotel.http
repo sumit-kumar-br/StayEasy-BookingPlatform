@@ -1,0 +1,6 @@
+@StayEasy.Hotel_HostAddress = http://localhost:5062
+
+GET {{StayEasy.Hotel_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

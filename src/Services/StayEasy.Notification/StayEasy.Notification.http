@@ -1,0 +1,6 @@
+@StayEasy.Notification_HostAddress = http://localhost:5154
+
+GET {{StayEasy.Notification_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

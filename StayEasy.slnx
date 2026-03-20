@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="src/Gateway/StayEasy.Gateway/StayEasy.Gateway.csproj" />
+  <Project Path="src/Services/StayEasy.Auth/StayEasy.Auth.csproj" />
+  <Project Path="src/Services/StayEasy.Booking/StayEasy.Booking.csproj" />
+  <Project Path="src/Services/StayEasy.Hotel/StayEasy.Hotel.csproj" />
+  <Project Path="src/Services/StayEasy.Notification/StayEasy.Notification.csproj" />
+  <Project Path="src/Services/StayEasy.Payment/StayEasy.Payment.csproj" />
+  <Project Path="src/Services/StayEasy.Search/StayEasy.Search.csproj" />
+  <Project Path="src/Shared/StayEasy.Shared/StayEasy.Shared.csproj" />
+</Solution>
