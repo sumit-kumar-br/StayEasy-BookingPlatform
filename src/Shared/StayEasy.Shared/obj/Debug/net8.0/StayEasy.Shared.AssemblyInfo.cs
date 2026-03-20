@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StayEasy.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd3c5c1e3a8006d6faeecf3b687ebf876a3df8df")]
 [assembly: System.Reflection.AssemblyProductAttribute("StayEasy.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StayEasy.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
