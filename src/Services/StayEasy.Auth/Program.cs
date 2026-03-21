@@ -1,13 +1,48 @@
+using Microsoft.EntityFrameworkCore;
+using StayEasy.Auth.Data;
+using StayEasy.Auth.Services;
+using StayEasy.Shared.Exceptions;
+using StayEasy.Shared.JWT;
+using System.Text.Json.Serialization;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// JWT Settings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddSingleton<JwtTokenGenerator>();
+
+// Database 
+builder.Services.AddDbContext<AuthDbContext>(options => 
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Auth
+builder.Services.AddJwtAuthentication(jwtSettings);
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// For add roles in string instead of numbers
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    options.UseInlineDefinitionsForEnums();
+//});
+
 var app = builder.Build();
+
+// Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -17,9 +52,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

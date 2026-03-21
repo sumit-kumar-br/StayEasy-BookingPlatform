@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3437ec7156efd96ebecd26a943f67454eae8b5d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
