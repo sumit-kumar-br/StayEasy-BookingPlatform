@@ -1,0 +1,14 @@
+﻿using System.Runtime.CompilerServices;
+
+namespace StayEasy.Hotel.DTOs
+{
+    public class CreateRoomTypeDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public int MaxOccupancy {  get; set; }
+        public decimal PricePerNight { get; set; }
+        public int TotalRooms { get; set; }
+        public string BedConfiguration { get; set; } = string.Empty;
+    }
+}
