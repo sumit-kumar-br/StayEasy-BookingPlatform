@@ -65,6 +65,8 @@ coverage*/
 # -------------------------------------------------------
 appsettings.json
 appsettings.*.json
+**/appsettings.json
+**/appsettings.*.json
 appsettings.Development.json
 appsettings.Production.json
 appsettings.Staging.json
