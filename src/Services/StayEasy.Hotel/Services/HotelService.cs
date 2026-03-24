@@ -124,12 +124,12 @@ namespace StayEasy.Hotel.Services
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
             if (uploadResult.Error != null)
-                return ApiResponse<bool>.Ok(true, "Photo uploaded successfully.");
+                return ApiResponse<bool>.Fail(uploadResult.Error.Message);
 
             hotel.PhotoUrl = uploadResult.SecureUrl.ToString();
             await _db.SaveChangesAsync();
 
-            return ApiResponse<bool>.Fail(uploadResult.Error.Message);
+            return ApiResponse<bool>.Ok(true, "Photo upload successfully.");
         }
         private static HotelResponseDto MapToDto(HotelModel hotel) => new()
         {
