@@ -1,0 +1,146 @@
+# ============================================================
+#  StayEasy — .gitignore
+#  Covers: .NET 8, ASP.NET Core, Angular 17, SQL Server, Stripe
+# ============================================================
+
+# -------------------------------------------------------
+# .NET / ASP.NET Core
+# -------------------------------------------------------
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.swp
+
+# Build output
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Visual Studio / Rider
+.idea/
+*.DotSettings.user
+*.pidb
+*.svclog
+*.scc
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.ReSharper.user
+*.resharper
+
+# Test results
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage*/
+
+# Publish output
+**/publish/
+**/PublishProfiles/
+
+# -------------------------------------------------------
+# Sensitive config — NEVER commit these
+# -------------------------------------------------------
+appsettings.json
+appsettings.*.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+*.pfx
+*.p12
+secrets.json
+**/*secrets*.json
+
+# -------------------------------------------------------
+# Environment variables
+# -------------------------------------------------------
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+
+# -------------------------------------------------------
+# Angular / Node
+# -------------------------------------------------------
+frontend/stayeasy-angular/node_modules/
+frontend/stayeasy-angular/dist/
+frontend/stayeasy-angular/.angular/
+frontend/stayeasy-angular/.cache/
+
+# Angular cache
+.angular/
+
+# npm / yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# -------------------------------------------------------
+# Docker (even though Day 10 — ignore generated files)
+# -------------------------------------------------------
+.dockerignore
+docker-compose.override.yml
+
+# -------------------------------------------------------
+# SQL Server
+# -------------------------------------------------------
+*.mdf
+*.ldf
+*.ndf
+
+# EF Core migrations snapshots (keep migrations, ignore backups)
+*_Backup.cs
+
+# -------------------------------------------------------
+# Stripe
+# -------------------------------------------------------
+.stripe/
+
+# -------------------------------------------------------
+# Cloudinary / upload temp files
+# -------------------------------------------------------
+**/uploads/temp/
+**/wwwroot/uploads/
+
+# -------------------------------------------------------
+# OS generated
+# -------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# -------------------------------------------------------
+# Logs
+# -------------------------------------------------------
+*.log
+logs/
