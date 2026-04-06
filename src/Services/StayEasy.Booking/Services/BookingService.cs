@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MassTransit;
 using StayEasy.Booking.DTOs;
 using StayEasy.Booking.Data;
 using StayEasy.Booking.Models;
 using StayEasy.Shared.Common;
+using StayEasy.Shared.Contracts.Notifications;
 using StayEasy.Shared.Enums;
 using StayEasy.Shared.Exceptions;
-using MassTransit.Internals.Caching;
 using BookingModel = StayEasy.Booking.Models.Booking;
 
 namespace StayEasy.Booking.Services
@@ -13,9 +14,11 @@ namespace StayEasy.Booking.Services
     public class BookingService: IBookingService
     {
         private readonly BookingDbContext _db;
-        public BookingService(BookingDbContext db)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public BookingService(BookingDbContext db, IPublishEndpoint publishEndpoint)
         {
             _db = db;
+            _publishEndpoint = publishEndpoint;
         }
         public async Task<ApiResponse<HoldResponseDto>> CreateHoldAsync(CreateHoldDto dto, Guid travelerId)
         {
@@ -118,7 +121,18 @@ namespace StayEasy.Booking.Services
             hold.IsReleased = true;
             await _db.SaveChangesAsync();
 
-            // TODO Day 5: publish BookingConfirmedEvent after payment
+            await _publishEndpoint.Publish(new BookingCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAtUtc = DateTime.UtcNow,
+                CorrelationId = booking.BookingRef,
+                BookingId = booking.Id,
+                UserId = travelerId,
+                Email = booking.GuestEmail,
+                HotelName = booking.HotelName,
+                CheckInUtc = booking.CheckIn,
+                CheckOutUtc = booking.CheckOut
+            });
 
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
         }
