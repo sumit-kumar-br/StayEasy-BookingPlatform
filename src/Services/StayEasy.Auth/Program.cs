@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 using StayEasy.Auth.Data;
 using StayEasy.Auth.Services;
 using StayEasy.Shared.Exceptions;
@@ -7,6 +8,8 @@ using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
@@ -19,6 +22,34 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((_, cfg) =>
+    {
+        var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
+        var rabbitVHost = builder.Configuration["RabbitMq:VirtualHost"] ?? "/";
+        var rabbitUser = builder.Configuration["RabbitMq:Username"] ?? "guest";
+        var rabbitPass = builder.Configuration["RabbitMq:Password"] ?? "guest";
+
+        cfg.Host(rabbitHost, rabbitVHost, h =>
+        {
+            h.Username(rabbitUser);
+            h.Password(rabbitPass);
+        });
+    });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontendCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200", "https://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Auth
 builder.Services.AddJwtAuthentication(jwtSettings);
@@ -52,6 +83,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

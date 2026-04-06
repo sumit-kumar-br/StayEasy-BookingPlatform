@@ -24,8 +24,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "refreshToken",
-        "Type": "System.String",
+        "Name": "dto",
+        "Type": "StayEasy.Auth.DTOs.TokenRequestDto",
         "IsRequired": true
       }
     ],
@@ -40,8 +40,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "refreshToken",
-        "Type": "System.String",
+        "Name": "dto",
+        "Type": "StayEasy.Auth.DTOs.TokenRequestDto",
         "IsRequired": true
       }
     ],
@@ -58,6 +58,64 @@
       {
         "Name": "dto",
         "Type": "StayEasy.Auth.DTOs.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Auth.Controllers.AuthController",
+    "Method": "GetUsers",
+    "RelativePath": "api/Auth/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Auth.Controllers.AuthController",
+    "Method": "BanUser",
+    "RelativePath": "api/Auth/users/{userId}/ban",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Auth.Controllers.AuthController",
+    "Method": "UnbanUser",
+    "RelativePath": "api/Auth/users/{userId}/unban",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Auth.Controllers.AuthController",
+    "Method": "VerifyUser",
+    "RelativePath": "api/Auth/users/{userId}/verify",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],

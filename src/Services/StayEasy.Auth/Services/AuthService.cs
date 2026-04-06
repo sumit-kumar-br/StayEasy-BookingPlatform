@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MassTransit;
 using StayEasy.Auth.Data;
 using StayEasy.Auth.DTOs;
 using StayEasy.Auth.Models;
 using StayEasy.Shared.Common;
+using StayEasy.Shared.Contracts.Notifications;
 using StayEasy.Shared.JWT;
 
 namespace StayEasy.Auth.Services
@@ -12,11 +14,17 @@ namespace StayEasy.Auth.Services
         private readonly AuthDbContext _db;
         private readonly JwtTokenGenerator _jwtGenerator;
         private readonly JwtSettings _jwtSettings;
-        public AuthService(AuthDbContext db, JwtTokenGenerator jwtGenerator, JwtSettings jwtSettings)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public AuthService(
+            AuthDbContext db,
+            JwtTokenGenerator jwtGenerator,
+            JwtSettings jwtSettings,
+            IPublishEndpoint publishEndpoint)
         {
             _db = db;
             _jwtGenerator = jwtGenerator;
             _jwtSettings = jwtSettings;
+            _publishEndpoint = publishEndpoint;
         }
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterDto dto)
         {
@@ -38,7 +46,15 @@ namespace StayEasy.Auth.Services
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
-            // TODO Day 6: publish UserRegisteredEvent for Notification Service
+            await _publishEndpoint.Publish(new UserRegisteredEvent
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAtUtc = DateTime.UtcNow,
+                CorrelationId = Guid.NewGuid().ToString("N"),
+                UserId = user.Id,
+                FullName = user.FullName,
+                Email = user.Email
+            });
 
             return ApiResponse<AuthResponseDto>.Ok(new AuthResponseDto
             {
@@ -137,6 +153,70 @@ namespace StayEasy.Auth.Services
             await _db.SaveChangesAsync();
 
             return ApiResponse<bool>.Ok(true, "logged out successfully.");
+        }
+
+        public async Task<ApiResponse<List<AdminUserDto>>> GetUsersAsync()
+        {
+            var users = await _db.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new AdminUserDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    Role = u.Role.ToString(),
+                    IsVerified = u.IsVerified,
+                    IsActive = u.IsActive,
+                    IsBanned = u.IsBanned,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+
+            return ApiResponse<List<AdminUserDto>>.Ok(users);
+        }
+
+        public async Task<ApiResponse<bool>> BanUserAsync(Guid userId)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return ApiResponse<bool>.Fail("User not found.");
+            }
+
+            user.IsBanned = true;
+            await _db.SaveChangesAsync();
+            return ApiResponse<bool>.Ok(true, "User has been banned.");
+        }
+
+        public async Task<ApiResponse<bool>> UnbanUserAsync(Guid userId)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return ApiResponse<bool>.Fail("User not found.");
+            }
+
+            user.IsBanned = false;
+            await _db.SaveChangesAsync();
+            return ApiResponse<bool>.Ok(true, "User has been unbanned.");
+        }
+
+        public async Task<ApiResponse<bool>> VerifyUserAsAdminAsync(Guid userId)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return ApiResponse<bool>.Fail("User not found.");
+            }
+
+            if (user.IsVerified)
+            {
+                return ApiResponse<bool>.Fail("User is already verified.");
+            }
+
+            user.IsVerified = true;
+            await _db.SaveChangesAsync();
+            return ApiResponse<bool>.Ok(true, "User has been verified.");
         }
     }
 }

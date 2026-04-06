@@ -10,5 +10,9 @@ namespace StayEasy.Auth.Services
         Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string refreshToken);
         Task<ApiResponse<bool>> VerifyEmailAsync(string token);
         Task<ApiResponse<bool>> LogoutAsync(string refreshToken);
+        Task<ApiResponse<List<AdminUserDto>>> GetUsersAsync();
+        Task<ApiResponse<bool>> BanUserAsync(Guid userId);
+        Task<ApiResponse<bool>> UnbanUserAsync(Guid userId);
+        Task<ApiResponse<bool>> VerifyUserAsAdminAsync(Guid userId);
     }
 }
