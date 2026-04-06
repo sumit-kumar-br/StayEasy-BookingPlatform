@@ -22,28 +22,266 @@ import { NotificationService } from '../../../core/services/notification.service
   ],
   template: `
     <mat-card class="card">
-      <h2>Edit Hotel</h2>
+      <div class="card-header">
+        <h2 class="title">✏️ Edit Hotel Details</h2>
+        <p class="subtitle">Update your hotel information and manage photos</p>
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Description</mat-label><textarea matInput formControlName="description"></textarea></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>City</mat-label><input matInput formControlName="city" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Address</mat-label><input matInput formControlName="address" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Country</mat-label><input matInput formControlName="country" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Star Rating</mat-label><input matInput type="number" min="1" max="5" formControlName="starRating" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude" /></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude" /></mat-form-field>
-        <button mat-flat-button color="primary" [disabled]="form.invalid">Update</button>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Hotel Name</mat-label>
+            <input matInput formControlName="name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="4"></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Country</mat-label>
+            <input matInput formControlName="country" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Star Rating (1-5)</mat-label>
+            <input matInput type="number" min="1" max="5" formControlName="starRating" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Latitude</mat-label>
+            <input matInput type="number" step="0.0001" formControlName="latitude" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Longitude</mat-label>
+            <input matInput type="number" step="0.0001" formControlName="longitude" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" [disabled]="form.invalid" class="submit-btn">
+            <span class="icon">✓</span> Save Changes
+          </button>
+        </div>
       </form>
 
-      <hr />
-      <h3>Upload Photo</h3>
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-      <button mat-stroked-button color="primary" [disabled]="!selectedFile" (click)="uploadPhoto()">
-        Upload Photo
-      </button>
+      <div class="photo-section">
+        <h3 class="section-title">📷 Hotel Photos</h3>
+        <p class="section-subtitle">Upload hotel photos to showcase your property</p>
+        
+        <div class="photo-upload">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput />
+          <label for="file-input" class="file-label">
+            <span>📁 Choose Photo</span>
+          </label>
+          <button mat-raised-button color="primary" [disabled]="!selectedFile" (click)="uploadPhoto()" class="upload-btn">
+            <span class="icon">⬆️</span> Upload Photo
+          </button>
+          <p class="file-info" *ngIf="selectedFile">Selected: {{ selectedFile.name }}</p>
+        </div>
+      </div>
     </mat-card>
   `,
-  styles: [`.card { max-width: 760px; margin: 24px auto; padding: 24px; } form { display: grid; gap: 12px; }`]
+  styles: [
+    `
+      .card {
+        max-width: 760px;
+        margin: 28px auto;
+        padding: 32px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(2, 6, 23, 0.08);
+      }
+
+      .card-header {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .title {
+        margin: 0 0 8px;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #0f2742;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .form-grid .col-full {
+        grid-column: 1 / -1;
+      }
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .submit-btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+
+      .submit-btn:hover:not([disabled]) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .icon {
+        font-size: 1.2rem;
+      }
+
+      .photo-section {
+        padding: 24px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4fa 100%);
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .section-title {
+        margin: 0 0 6px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f2742;
+      }
+
+      .section-subtitle {
+        margin: 0 0 16px;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .photo-upload {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      .file-label {
+        padding: 10px 16px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.95rem;
+      }
+
+      .file-label:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+
+      .upload-btn {
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+      }
+
+      .upload-btn:hover:not([disabled]) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .upload-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .file-info {
+        margin: 0;
+        color: #667eea;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      @media (max-width: 768px) {
+        .card {
+          margin: 16px;
+          padding: 20px;
+        }
+
+        .title {
+          font-size: 1.5rem;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .photo-upload {
+          flex-direction: column;
+        }
+
+        .file-label,
+        .upload-btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    `
+  ]
 })
 export class EditHotelComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

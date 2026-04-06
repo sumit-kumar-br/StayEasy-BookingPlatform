@@ -50,6 +50,16 @@ namespace StayEasy.Booking.Controllers
             var result = await _bookingService.CancelBookingAsync(bookingId, travelerId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
+        [HttpPost("{bookingId}/manager-cancel")]
+        [Authorize(Roles = "HotelManager")]
+        public async Task<IActionResult> CancelBookingAsManager(Guid bookingId)
+        {
+            var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _bookingService.CancelBookingAsManagerAsync(bookingId, managerId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         [HttpGet("my")]
         public async Task<IActionResult> GetMyBookings()
         {
@@ -62,6 +72,14 @@ namespace StayEasy.Booking.Controllers
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _bookingService.GetBookingByIdAsync(bookingId, travelerId);
+            return Ok(result);
+        }
+
+        [HttpGet("incoming")]
+        [Authorize(Roles = "HotelManager,Admin")]
+        public async Task<IActionResult> GetIncomingBookings()
+        {
+            var result = await _bookingService.GetIncomingBookingsAsync();
             return Ok(result);
         }
     }

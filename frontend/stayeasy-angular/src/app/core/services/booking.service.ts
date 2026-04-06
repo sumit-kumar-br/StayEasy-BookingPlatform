@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../models/api-response.model';
 import { Booking, ConfirmBookingRequest, CreateHoldRequest, Hold } from '../../models/booking.model';
@@ -30,12 +30,37 @@ export class BookingService {
   confirmBooking(request: ConfirmBookingRequest): Observable<Booking> {
     return this.http
       .post<ApiResponse<Booking>>(`${environment.bookingApiUrl}/bookings/confirm`, request)
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => res.data),
+        catchError((error) => {
+          if (error?.status !== 503) {
+            return throwError(() => error);
+          }
+
+          // Fallback when gateway can't reach downstream booking service.
+          return this.http
+            .post<ApiResponse<Booking>>('https://localhost:7120/api/bookings/confirm', request)
+            .pipe(
+              map((res) => res.data),
+              catchError(() =>
+                this.http
+                  .post<ApiResponse<Booking>>('http://localhost:5267/api/bookings/confirm', request)
+                  .pipe(map((res) => res.data))
+              )
+            );
+        })
+      );
   }
 
   cancelBooking(id: string): Observable<unknown> {
     return this.http
       .post<ApiResponse<unknown>>(`${environment.bookingApiUrl}/bookings/${id}/cancel`, {})
+      .pipe(map((res) => res.data));
+  }
+
+  cancelBookingAsManager(id: string): Observable<unknown> {
+    return this.http
+      .post<ApiResponse<unknown>>(`${environment.bookingApiUrl}/bookings/${id}/manager-cancel`, {})
       .pipe(map((res) => res.data));
   }
 

@@ -102,7 +102,7 @@ namespace StayEasy.Auth.Services
         public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string refreshToken)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken 
-                                                            && u.RefreshTokenExpiry < DateTime.UtcNow);
+                                                            && u.RefreshTokenExpiry > DateTime.UtcNow);
 
             if (user == null)
                 return ApiResponse<AuthResponseDto>.Fail("Invalid or expired refresh token.");
@@ -128,7 +128,7 @@ namespace StayEasy.Auth.Services
         public async Task<ApiResponse<bool>> VerifyEmailAsync(string token)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.VerificationToken == token && 
-                                                            u.VerificationTokenExpiry < DateTime.UtcNow);
+                                                            u.VerificationTokenExpiry > DateTime.UtcNow);
 
             if (user == null)
                 return ApiResponse<bool>.Fail("Invalid or expired verification token.");
@@ -143,10 +143,13 @@ namespace StayEasy.Auth.Services
 
         public async Task<ApiResponse<bool>> LogoutAsync(string refreshToken)
         {
+            if (string.IsNullOrWhiteSpace(refreshToken))
+                return ApiResponse<bool>.Ok(true, "Logged out successfully.");
+
             var user = await _db.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
 
             if (user == null)
-                return ApiResponse<bool>.Fail("Invalid refresh token.");
+                return ApiResponse<bool>.Ok(true, "Logged out successfully.");
 
             user.RefreshToken = null;
             user.RefreshTokenExpiry = null;

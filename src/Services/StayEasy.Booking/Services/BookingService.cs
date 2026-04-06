@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using System.Net.Http.Json;
 using StayEasy.Booking.DTOs;
 using StayEasy.Booking.Data;
 using StayEasy.Booking.Models;
@@ -15,10 +16,12 @@ namespace StayEasy.Booking.Services
     {
         private readonly BookingDbContext _db;
         private readonly IPublishEndpoint _publishEndpoint;
-        public BookingService(BookingDbContext db, IPublishEndpoint publishEndpoint)
+        private readonly IHttpClientFactory _httpClientFactory;
+        public BookingService(BookingDbContext db, IPublishEndpoint publishEndpoint, IHttpClientFactory httpClientFactory)
         {
             _db = db;
             _publishEndpoint = publishEndpoint;
+            _httpClientFactory = httpClientFactory;
         }
         public async Task<ApiResponse<HoldResponseDto>> CreateHoldAsync(CreateHoldDto dto, Guid travelerId)
         {
@@ -147,19 +150,55 @@ namespace StayEasy.Booking.Services
             if (booking.Status == BookingStatus.Cancelled)
                 return ApiResponse<bool>.Fail("Booking is already cancelled.");
 
-            if (booking.CheckIn <= DateTime.UtcNow)
-                return ApiResponse<bool>.Fail("Cannot cancel a booking after check-in date.");
+            if (booking.Status == BookingStatus.CheckedIn ||
+                booking.Status == BookingStatus.CheckedOut ||
+                booking.Status == BookingStatus.NoShow)
+                return ApiResponse<bool>.Fail("This booking can no longer be cancelled.");
 
-            booking.Status = BookingStatus.Cancelled;
-            booking.CancelledAt = DateTime.UtcNow;
+            _db.Bookings.Remove(booking);
             await _db.SaveChangesAsync();
 
             // TODO Day 5: publish BookingCancelledEvent for refund + notification
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
         }
+
+        public async Task<ApiResponse<bool>> CancelBookingAsManagerAsync(Guid bookingId, Guid managerId)
+        {
+            var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+
+            if (booking == null)
+                throw new NotFoundException("Booking", bookingId);
+
+            var isManagedByRequester = await IsHotelOwnedByManagerAsync(booking.HotelId, managerId);
+            if (!isManagedByRequester)
+                return ApiResponse<bool>.Fail("You can cancel bookings only for your hotels.");
+
+            if (booking.Status == BookingStatus.Cancelled)
+                return ApiResponse<bool>.Fail("Booking is already cancelled.");
+
+            if (booking.Status == BookingStatus.CheckedIn ||
+                booking.Status == BookingStatus.CheckedOut ||
+                booking.Status == BookingStatus.NoShow)
+                return ApiResponse<bool>.Fail("This booking can no longer be cancelled.");
+
+            _db.Bookings.Remove(booking);
+            await _db.SaveChangesAsync();
+
+            return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
+        }
         public async Task<ApiResponse<List<BookingResponseDto>>> GetMyBookingsAsync(Guid travelerId)
         {
+            var cancelledBookings = await _db.Bookings
+                .Where(b => b.TravelerId == travelerId && b.Status == BookingStatus.Cancelled)
+                .ToListAsync();
+
+            if (cancelledBookings.Count > 0)
+            {
+                _db.Bookings.RemoveRange(cancelledBookings);
+                await _db.SaveChangesAsync();
+            }
+
             var bookings = await _db.Bookings.Where(b => b.TravelerId == travelerId)
                                             .OrderByDescending(b => b.CreatedAt)
                                             .ToListAsync();
@@ -174,6 +213,26 @@ namespace StayEasy.Booking.Services
                 throw new NotFoundException("Booking", bookingId);
 
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
+        }
+
+        public async Task<ApiResponse<List<BookingResponseDto>>> GetIncomingBookingsAsync()
+        {
+            var cancelledBookings = await _db.Bookings
+                .Where(b => b.Status == BookingStatus.Cancelled)
+                .ToListAsync();
+
+            if (cancelledBookings.Count > 0)
+            {
+                _db.Bookings.RemoveRange(cancelledBookings);
+                await _db.SaveChangesAsync();
+            }
+
+            var bookings = await _db.Bookings
+                .Where(b => b.Status == BookingStatus.Pending || b.Status == BookingStatus.Confirmed)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            return ApiResponse<List<BookingResponseDto>>.Ok(bookings.Select(MapBookingToDto).ToList());
         }
 
         private static HoldResponseDto MapHoldToDto(HoldRecord hold) => new()
@@ -209,5 +268,35 @@ namespace StayEasy.Booking.Services
             SpecialRequests = booking.SpecialRequests,
             CreatedAt = booking.CreatedAt
         };
+
+        private async Task<bool> IsHotelOwnedByManagerAsync(Guid hotelId, Guid managerId)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"http://localhost:5062/api/hotels/{hotelId}";
+
+            try
+            {
+                var response = await client.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+                var payload = await response.Content.ReadFromJsonAsync<ApiEnvelope<HotelOwnershipDto>>();
+                return payload?.Data?.ManagerId == managerId;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private sealed class ApiEnvelope<T>
+        {
+            public T? Data { get; set; }
+        }
+
+        private sealed class HotelOwnershipDto
+        {
+            public Guid ManagerId { get; set; }
+        }
     }
 }

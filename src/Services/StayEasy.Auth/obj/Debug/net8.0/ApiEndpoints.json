@@ -125,6 +125,22 @@
     "ContainingType": "StayEasy.Auth.Controllers.AuthController",
     "Method": "VerifyEmail",
     "RelativePath": "api/Auth/verify-email",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Auth.Controllers.AuthController",
+    "Method": "VerifyEmailPost",
+    "RelativePath": "api/Auth/verify-email",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,

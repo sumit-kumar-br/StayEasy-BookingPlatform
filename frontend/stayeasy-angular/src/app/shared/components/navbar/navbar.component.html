@@ -4,6 +4,16 @@
   <span class="spacer"></span>
 
   <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+    <!-- Dashboard button for travellers on non-dashboard pages -->
+    <button 
+      *ngIf="user.role === role.Traveler && shouldShowDashboardBtn()" 
+      mat-button 
+      (click)="goToDashboard()"
+      title="Return to dashboard">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </button>
+
     <button mat-button routerLink="/workspace">Workspace</button>
 
     <button mat-button [matMenuTriggerFor]="profileMenu">{{ user.fullName }}</button>

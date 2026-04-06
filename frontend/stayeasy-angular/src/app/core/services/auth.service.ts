@@ -18,6 +18,10 @@ interface AuthApiUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly storageUserKey = 'stayeasy.user';
+  private readonly storageAccessTokenKey = 'stayeasy.accessToken';
+  private readonly storageRefreshTokenKey = 'stayeasy.refreshToken';
+
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
@@ -27,6 +31,10 @@ export class AuthService {
   private accessToken: string | null = null;
   private refreshTokenValue: string | null = null;
   private refreshTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    this.restoreSession();
+  }
 
   login(credentials: LoginRequest): Observable<User> {
     return this.http.post<ApiResponse<AuthApiUser>>(`${environment.authApiUrl}/auth/login`, credentials).pipe(
@@ -126,6 +134,7 @@ export class AuthService {
     this.accessToken = user.accessToken;
     this.refreshTokenValue = user.refreshToken;
     this.currentUserSubject.next(user);
+    this.persistSession(user);
     this.scheduleRefresh(user.accessToken);
   }
 
@@ -133,6 +142,9 @@ export class AuthService {
     this.accessToken = null;
     this.refreshTokenValue = null;
     this.currentUserSubject.next(null);
+    localStorage.removeItem(this.storageUserKey);
+    localStorage.removeItem(this.storageAccessTokenKey);
+    localStorage.removeItem(this.storageRefreshTokenKey);
 
     if (this.refreshTimeout) {
       clearTimeout(this.refreshTimeout);
@@ -198,6 +210,35 @@ export class AuthService {
       accessToken: user.accessToken,
       refreshToken: user.refreshToken ?? user.referenceToken ?? ''
     };
+  }
+
+  private persistSession(user: User): void {
+    localStorage.setItem(this.storageUserKey, JSON.stringify(user));
+    localStorage.setItem(this.storageAccessTokenKey, user.accessToken);
+    localStorage.setItem(this.storageRefreshTokenKey, user.refreshToken);
+  }
+
+  private restoreSession(): void {
+    try {
+      const rawUser = localStorage.getItem(this.storageUserKey);
+      const accessToken = localStorage.getItem(this.storageAccessTokenKey);
+      const refreshToken = localStorage.getItem(this.storageRefreshTokenKey);
+
+      if (!rawUser || !accessToken || !refreshToken) {
+        return;
+      }
+
+      const user = JSON.parse(rawUser) as User;
+      user.accessToken = accessToken;
+      user.refreshToken = refreshToken;
+
+      this.accessToken = accessToken;
+      this.refreshTokenValue = refreshToken;
+      this.currentUserSubject.next(user);
+      this.scheduleRefresh(accessToken);
+    } catch {
+      this.clearSession();
+    }
   }
 
   private toUserRole(role: string | number): UserRole {

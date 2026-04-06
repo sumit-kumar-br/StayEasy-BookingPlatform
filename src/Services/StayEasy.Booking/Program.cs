@@ -22,6 +22,7 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
 
 // Services
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddMassTransit(x =>
 {

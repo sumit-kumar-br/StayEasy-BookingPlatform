@@ -12,56 +12,220 @@ import { Hotel } from '../../../models/hotel.model';
   imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule],
   template: `
     <section class="container">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">Admin Workspace</p>
-          <h1>Platform Control Center</h1>
-          <p>Approve hotel submissions, monitor inventory growth, and oversee user activity.</p>
+      <div class="hero">
+        <div class="hero-content">
+          <h2 class="eyebrow">🎛️ Platform Control</h2>
+          <h1>Admin Dashboard</h1>
+          <p>Comprehensive platform oversight with real-time insights and management controls.</p>
+          <div class="cta">
+            <button mat-raised-button color="primary" routerLink="/admin/hotels">
+              <span class="icon">📋</span> Review Hotels
+            </button>
+            <button mat-raised-button color="accent" routerLink="/admin/users">
+              <span class="icon">👥</span> Manage Users
+            </button>
+          </div>
         </div>
-        <div class="actions">
-          <button mat-flat-button color="primary" routerLink="/admin/hotels">Review Hotels</button>
-          <button mat-stroked-button routerLink="/admin/users">Manage Users</button>
-        </div>
-      </header>
+      </div>
 
-      <div class="grid">
-        <mat-card>
-          <h3>Total Hotels</h3>
-          <p>{{ hotels.length }}</p>
+      <div class="stats-grid">
+        <mat-card class="stat-card">
+          <div class="stat-icon">📊</div>
+          <p class="label">Total Hotels</p>
+          <p class="stat">{{ hotels.length }}</p>
+          <p class="subtitle">Across all regions</p>
         </mat-card>
-        <mat-card>
-          <h3>Pending Approvals</h3>
-          <p>{{ pendingCount }}</p>
+
+        <mat-card class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <p class="label">Pending Approvals</p>
+          <p class="stat">{{ pendingCount }}</p>
+          <p class="subtitle">Awaiting review</p>
         </mat-card>
-        <mat-card>
-          <h3>Approved Hotels</h3>
-          <p>{{ approvedCount }}</p>
+
+        <mat-card class="stat-card">
+          <div class="stat-icon">✅</div>
+          <p class="label">Approved Hotels</p>
+          <p class="stat">{{ approvedCount }}</p>
+          <p class="subtitle">Active listings</p>
         </mat-card>
       </div>
     </section>
   `,
   styles: [
     `
-      .container { max-width: 1120px; margin: 22px auto; padding: 0 16px; }
-      .hero {
-        display: flex;
-        justify-content: space-between;
-        align-items: end;
-        gap: 18px;
-        margin-bottom: 16px;
-        padding: 20px;
-        border-radius: 16px;
-        color: #f6fbff;
-        background: linear-gradient(135deg, #2b2f3a, #455164);
+      .container { 
+        max-width: 1120px; 
+        margin: 0 auto; 
+        padding: 0 16px; 
       }
-      .eyebrow { margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; color: #d5deeb; }
-      h1 { margin: 0 0 8px; }
-      .hero p { margin: 0; color: #e3edf9; }
-      .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); }
-      .grid mat-card p { font-size: 2rem; font-weight: 700; color: #2b425f; margin: 10px 0 0; }
+
+      .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 64px 48px;
+        border-radius: 16px;
+        margin: 28px 0 40px;
+        color: white;
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+      }
+
+      .hero-content {
+        max-width: 600px;
+      }
+
+      .hero h1 {
+        margin: 16px 0 0;
+        font-size: 2.6rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .hero h2 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        opacity: 0.95;
+        letter-spacing: 0.5px;
+      }
+
+      .hero p {
+        margin: 16px 0 28px;
+        opacity: 0.95;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        max-width: 580px;
+      }
+
+      .cta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .cta button {
+        font-size: 1rem;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .cta button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .icon {
+        font-size: 1.2rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin: 0 0 40px;
+      }
+
+      .stat-card {
+        padding: 28px 24px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(2, 6, 23, 0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.12);
+        border-color: #667eea;
+      }
+
+      .stat-icon {
+        font-size: 3.2rem;
+        margin-bottom: 12px;
+        opacity: 0.95;
+      }
+
+      .label {
+        margin: 0 0 8px;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat {
+        margin: 0 0 4px;
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: #667eea;
+        line-height: 1;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 0.8rem;
+      }
+
       @media (max-width: 768px) {
-        .hero { flex-direction: column; align-items: start; }
+        .hero {
+          padding: 48px 28px;
+          border-radius: 14px;
+          margin: 20px 0 32px;
+        }
+
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 0.95rem;
+          margin: 12px 0 20px;
+        }
+
+        .cta {
+          gap: 12px;
+        }
+
+        .cta button {
+          flex: 1;
+          min-height: 44px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          margin: 0 0 24px;
+        }
+
+        .stat {
+          font-size: 2.2rem;
+        }
+
+        .stat-icon {
+          font-size: 2.4rem;
+        }
       }
     `
   ]

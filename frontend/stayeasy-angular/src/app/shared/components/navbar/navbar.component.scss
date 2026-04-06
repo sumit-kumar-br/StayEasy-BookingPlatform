@@ -2,13 +2,20 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
   text-decoration: none;
   color: white;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 .spacer {

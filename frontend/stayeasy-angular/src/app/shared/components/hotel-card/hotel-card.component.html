@@ -1,13 +1,25 @@
 <mat-card class="hotel-card">
-  <img [src]="hotel.photoUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop'" [alt]="hotel.name" />
+  <div class="image-container">
+    <img [src]="hotel.photoUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop'" [alt]="hotel.name" />
+    <div class="rating-badge">
+      <mat-icon class="star-icon">star_rate</mat-icon>
+      <span class="rating-value">{{ hotel.starRating }}</span>
+    </div>
+  </div>
   <mat-card-content>
-    <h3>{{ hotel.name }}</h3>
-    <p>{{ hotel.city }}, {{ hotel.country }}</p>
+    <h3 class="hotel-name">{{ hotel.name }}</h3>
+    <p class="location">📍 {{ hotel.city }}, {{ hotel.country }}</p>
     <p class="description">{{ hotel.description }}</p>
-    <app-star-rating [rating]="hotel.starRating"></app-star-rating>
-    <p class="price">From {{ hotel.lowestPricePerNight ?? hotel.roomTypes?.[0]?.pricePerNight ?? 0 | currency : 'INR' : 'symbol' : '1.0-0' }}</p>
+    <div class="rating-container">
+      <app-star-rating [rating]="hotel.starRating"></app-star-rating>
+      <span class="rating-text">({{ hotel.starRating }}/5)</span>
+    </div>
+    <div class="price-container">
+      <span class="price-label">From</span>
+      <p class="price">{{ hotel.lowestPricePerNight ?? hotel.roomTypes?.[0]?.pricePerNight ?? 0 | currency : 'INR' : 'symbol' : '1.0-0' }}</p>
+    </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-flat-button color="primary" (click)="onView()">View Hotel</button>
+    <button mat-flat-button color="primary" (click)="onView()" class="view-btn">View Hotel</button>
   </mat-card-actions>
 </mat-card>

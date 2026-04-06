@@ -432,10 +432,10 @@ C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\o
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\staticwebassets.development.json
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\swae.build.ex.cache
-C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\StayEasy.10187FF1.Up2Date
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\StayEasy.Booking.dll
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\refint\StayEasy.Booking.dll
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\StayEasy.Booking.pdb
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\StayEasy.Booking.genruntimeconfig.cache
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\ref\StayEasy.Booking.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

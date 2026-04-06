@@ -17,7 +17,7 @@ namespace StayEasy.Booking.Models
         public DateTime CheckOut { get; set; }
         public int Guests { get; set; }
         public decimal TotalAmount { get; set; }
-        public BookingStatus Status = BookingStatus.Pending;
+        public BookingStatus Status { get; set; } = BookingStatus.Pending;
         public string? SpecialRequests { get; set; }
         public string? StripePaymentIntentId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
