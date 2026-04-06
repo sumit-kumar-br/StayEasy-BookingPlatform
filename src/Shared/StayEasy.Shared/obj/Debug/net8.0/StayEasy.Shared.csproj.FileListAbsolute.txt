@@ -11,3 +11,28 @@ C:\CS\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayE
 C:\CS\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\refint\StayEasy.Shared.dll
 C:\CS\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.pdb
 C:\CS\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\ref\StayEasy.Shared.dll
+C:\CS\New folder\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.deps.json
+C:\CS\New folder\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.dll
+C:\CS\New folder\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.pdb
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.csproj.AssemblyReference.cache
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.AssemblyInfoInputs.cache
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.AssemblyInfo.cs
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.csproj.CoreCompileInputs.cache
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.dll
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\refint\StayEasy.Shared.dll
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.pdb
+C:\CS\New folder\src\Shared\StayEasy.Shared\obj\Debug\net8.0\ref\StayEasy.Shared.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.deps.json
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\Debug\net8.0\StayEasy.Shared.pdb
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.csproj.AssemblyReference.cache
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.AssemblyInfoInputs.cache
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.AssemblyInfo.cs
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.csproj.CoreCompileInputs.cache
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.sourcelink.json
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\refint\StayEasy.Shared.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.pdb
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\ref\StayEasy.Shared.dll
