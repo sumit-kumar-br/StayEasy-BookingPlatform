@@ -44,6 +44,7 @@ namespace StayEasy.Search.Services
             {
                 Id = h.Id,
                 Name = h.Name,
+                Description = h.Description,
                 City = h.City,
                 Address = h.Address,
                 Country = h.Country,
@@ -67,6 +68,7 @@ namespace StayEasy.Search.Services
             {
                 Id = hotel.Id,
                 Name = hotel.Name,
+                Description = hotel.Description,
                 City = hotel.City,
                 Address = hotel.Address,
                 Country = hotel.Country,
