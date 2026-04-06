@@ -17,6 +17,16 @@
   },
   {
     "ContainingType": "StayEasy.Hotel.Controllers.HotelsController",
+    "Method": "GetAllHotels",
+    "RelativePath": "api/Hotels",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Hotel.Controllers.HotelsController",
     "Method": "GetHotel",
     "RelativePath": "api/Hotels/{id}",
     "HttpMethod": "GET",

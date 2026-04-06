@@ -38,6 +38,15 @@ namespace StayEasy.Hotel.Controllers
             var result = await _hotelService.GetMyHotelsAsync(managerId);
             return Ok(result);
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllHotels()
+        {
+            var result = await _hotelService.GetAllHotelsAsync();
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "HotelManager")]
         public async Task<IActionResult> UpdateHotel(Guid id, [FromBody] UpdateHotelDto dto)

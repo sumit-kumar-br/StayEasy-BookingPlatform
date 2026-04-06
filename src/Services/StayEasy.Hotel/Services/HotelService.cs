@@ -62,6 +62,17 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<List<HotelResponseDto>>.Ok(hotels.Select(MapToDto).ToList());
 
         }
+
+        public async Task<ApiResponse<List<HotelResponseDto>>> GetAllHotelsAsync()
+        {
+            var hotels = await _db.Hotels
+                .Include(h => h.RoomTypes)
+                .OrderByDescending(h => h.CreatedAt)
+                .ToListAsync();
+
+            return ApiResponse<List<HotelResponseDto>>.Ok(hotels.Select(MapToDto).ToList());
+        }
+
         public async Task<ApiResponse<HotelResponseDto>> UpdateHotelAsync(Guid hotelId, UpdateHotelDto dto, Guid managerId)
         {
             var hotel = await _db.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId && h.ManagerId == managerId);
