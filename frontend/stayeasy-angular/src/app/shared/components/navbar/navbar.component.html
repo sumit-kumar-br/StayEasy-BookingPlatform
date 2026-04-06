@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" class="nav">
+  <a class="logo" routerLink="/">StayEasy</a>
+
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+    <button mat-button routerLink="/workspace">Workspace</button>
+
+    <button mat-button [matMenuTriggerFor]="profileMenu">{{ user.fullName }}</button>
+    <mat-menu #profileMenu="matMenu">
+      <button mat-menu-item routerLink="/workspace">Workspace Home</button>
+      <button mat-menu-item *ngIf="user.role === role.Admin" routerLink="/admin/hotels">Hotel Approvals</button>
+      <button mat-menu-item *ngIf="user.role === role.Admin" routerLink="/admin/users">User Management</button>
+      <button mat-menu-item *ngIf="user.role === role.Admin" routerLink="/admin/dashboard">Admin Dashboard</button>
+      <button mat-menu-item *ngIf="user.role === role.HotelManager" routerLink="/manager/hotels">My Hotels</button>
+      <button mat-menu-item *ngIf="user.role === role.HotelManager" routerLink="/manager/bookings">Incoming Bookings</button>
+      <button mat-menu-item *ngIf="user.role === role.Traveler" routerLink="/dashboard/bookings">My Bookings</button>
+      <button mat-menu-item (click)="logout()">Logout</button>
+    </mat-menu>
+  </ng-container>
+
+  <ng-template #guestLinks>
+    <button mat-button routerLink="/login">Login</button>
+    <button mat-flat-button color="accent" routerLink="/register">Register</button>
+  </ng-template>
+</mat-toolbar>

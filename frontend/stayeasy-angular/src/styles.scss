@@ -1,0 +1,45 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-palette: mat.define-palette(mat.$blue-palette, 700, 500, 900);
+$accent-palette: mat.define-palette(mat.$cyan-palette, A200, A100, A400);
+$warn-palette: mat.define-palette(mat.$red-palette);
+
+$theme: mat.define-light-theme(
+	(
+		color: (
+			primary: $primary-palette,
+			accent: $accent-palette,
+			warn: $warn-palette
+		),
+		density: 0
+	)
+);
+
+@include mat.all-component-themes($theme);
+
+html,
+body {
+	margin: 0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background: #f8fbff;
+	color: #0f172a;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.snackbar-success {
+	--mdc-snackbar-container-color: #14532d;
+	--mat-mdc-snack-bar-button-color: #ffffff;
+	--mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.snackbar-error {
+	--mdc-snackbar-container-color: #991b1b;
+	--mat-mdc-snack-bar-button-color: #ffffff;
+	--mdc-snackbar-supporting-text-color: #ffffff;
+}
+/* You can add global styles to this file, and also import other style files */

@@ -1,0 +1,32 @@
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pending {
+  background: #fff3cd;
+  color: #896504;
+}
+
+.confirmed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.checked-in {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.default {
+  background: #e5e7eb;
+  color: #374151;
+}
