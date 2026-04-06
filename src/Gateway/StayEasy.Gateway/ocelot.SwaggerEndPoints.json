@@ -1,0 +1,64 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "auth",
+      "Config": [
+        {
+          "Name": "StayEasy Auth",
+          "Version": "v1",
+          "Url": "https://localhost:7159/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "hotel",
+      "Config": [
+        {
+          "Name": "StayEasy Hotel",
+          "Version": "v1",
+          "Url": "https://localhost:7272/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "search",
+      "Config": [
+        {
+          "Name": "StayEasy Search",
+          "Version": "v1",
+          "Url": "https://localhost:7063/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "booking",
+      "Config": [
+        {
+          "Name": "StayEasy Booking",
+          "Version": "v1",
+          "Url": "https://localhost:7120/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "payment",
+      "Config": [
+        {
+          "Name": "StayEasy Payment",
+          "Version": "v1",
+          "Url": "http://localhost:5057/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "notification",
+      "Config": [
+        {
+          "Name": "StayEasy Notification",
+          "Version": "v1",
+          "Url": "https://localhost:7153/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}
