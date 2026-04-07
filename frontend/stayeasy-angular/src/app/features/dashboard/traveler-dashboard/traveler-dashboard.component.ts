@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { BookingService } from '../../../core/services/booking.service';
 import { Booking } from '../../../models/booking.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
@@ -11,7 +10,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 @Component({
   selector: 'app-traveler-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatIconModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, StatusBadgeComponent],
   template: `
     <section class="dashboard-container">
       <header class="hero-section">
@@ -22,11 +21,11 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
         </div>
         <div class="hero-actions">
           <button mat-raised-button color="primary" routerLink="/">
-            <mat-icon>search</mat-icon>
+            <span class="button-icon" aria-hidden="true">🔍</span>
             Search Hotels
           </button>
-          <button mat-stroked-button color="primary" routerLink="/dashboard/bookings">
-            <mat-icon>list_alt</mat-icon>
+          <button mat-raised-button color="primary" routerLink="/dashboard/bookings">
+            <span class="button-icon" aria-hidden="true">📖</span>
             View All Bookings
           </button>
         </div>
@@ -53,9 +52,6 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       <mat-card class="recent-bookings">
         <div class="section-header">
           <h2>Recent Bookings</h2>
-          <button mat-icon-button routerLink="/dashboard/bookings">
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
         </div>
 
         <div class="empty-state" *ngIf="!bookings.length">
@@ -69,15 +65,15 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
             <div class="booking-info">
               <h4>{{ booking.hotelName }}</h4>
               <p class="booking-dates">
-                <mat-icon>calendar_today</mat-icon>
+                <span class="inline-icon booking-date-icon" aria-hidden="true">📅</span>
                 {{ booking.checkIn | date: 'MMM dd' }} - {{ booking.checkOut | date: 'MMM dd, yyyy' }}
               </p>
               <p class="booking-room">{{ booking.roomTypeName }}</p>
             </div>
             <div class="booking-status-section">
               <app-status-badge [status]="booking.status"></app-status-badge>
-              <button mat-icon-button color="primary" [routerLink]="['/dashboard/bookings', booking.id]" title="View booking details">
-                <mat-icon>arrow_forward</mat-icon>
+              <button mat-button class="view-details-link" [routerLink]="['/dashboard/bookings', booking.id]">
+                View Details
               </button>
             </div>
           </div>
@@ -139,14 +135,26 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
         flex-wrap: wrap;
 
         button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
           min-height: 44px;
           padding: 0 24px;
           font-weight: 500;
-
-          mat-icon {
-            margin-right: 8px;
-          }
         }
+      }
+
+      .button-icon {
+        font-size: 1.1rem;
+        line-height: 1;
+      }
+
+      .inline-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
       }
 
       .stats-grid {
@@ -247,14 +255,16 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px;
-        background: #f9fafb;
-        border-radius: 8px;
+        padding: 24px 28px;
+        background: #f8fbff;
+        border-radius: 16px;
         border-left: 4px solid #667eea;
-        transition: all 0.2s ease;
+        box-shadow: 0 8px 22px rgba(2, 6, 23, 0.08);
+        transition: all 0.25s ease;
 
         &:hover {
-          background: #f0f4ff;
+          background: #f3f7ff;
+          transform: translateY(-1px);
         }
       }
 
@@ -275,19 +285,17 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
           display: flex;
           align-items: center;
           gap: 8px;
-
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            color: #667eea;
-          }
         }
       }
 
       .booking-dates {
         font-weight: 500;
         color: #0f2742 !important;
+
+        .booking-date-icon {
+          font-size: 1rem;
+          color: #667eea;
+        }
       }
 
       .booking-room {
@@ -297,7 +305,39 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       .booking-status-section {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 18px;
+
+        .view-details-link {
+          min-width: auto;
+          padding: 0;
+          color: #4f58c9;
+          font-size: 1.05rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          line-height: 1.2;
+        }
+
+        .view-details-link:hover {
+          color: #3944b6;
+          text-decoration: underline;
+          text-decoration-thickness: 2px;
+          text-underline-offset: 3px;
+        }
+
+        ::ng-deep .badge {
+          border-radius: 14px;
+          padding: 10px 22px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          border: 1px solid transparent;
+        }
+
+        ::ng-deep .badge.confirmed {
+          color: #1f7a46;
+          background: #d6f3e3;
+          border-color: #95ddb6;
+          box-shadow: inset 0 0 0 1px rgba(149, 221, 182, 0.35);
+        }
       }
 
       @media (max-width: 1024px) {

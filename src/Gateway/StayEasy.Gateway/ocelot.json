@@ -11,7 +11,14 @@
       ],
       "UpstreamPathTemplate": "/api/auth",
       "SwaggerKey": "auth",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -27,7 +34,14 @@
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
       "SwaggerKey": "auth",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -43,7 +57,14 @@
       ],
       "UpstreamPathTemplate": "/api/hotels",
       "SwaggerKey": "hotel",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -59,7 +80,14 @@
       ],
       "UpstreamPathTemplate": "/api/hotels/{everything}",
       "SwaggerKey": "hotel",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -75,7 +103,14 @@
       ],
       "UpstreamPathTemplate": "/api/rooms",
       "SwaggerKey": "hotel",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -91,7 +126,14 @@
       ],
       "UpstreamPathTemplate": "/api/rooms/{everything}",
       "SwaggerKey": "hotel",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -107,7 +149,14 @@
       ],
       "UpstreamPathTemplate": "/api/search",
       "SwaggerKey": "search",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -123,7 +172,14 @@
       ],
       "UpstreamPathTemplate": "/api/search/{everything}",
       "SwaggerKey": "search",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -139,7 +195,14 @@
       ],
       "UpstreamPathTemplate": "/api/bookings",
       "SwaggerKey": "booking",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -155,7 +218,14 @@
       ],
       "UpstreamPathTemplate": "/api/bookings/{everything}",
       "SwaggerKey": "booking",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -171,7 +241,14 @@
       ],
       "UpstreamPathTemplate": "/api/payments",
       "SwaggerKey": "payment",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ]
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ]
     },
     {
       "DownstreamPathTemplate": "/api/payments/{everything}",
@@ -184,7 +261,14 @@
       ],
       "UpstreamPathTemplate": "/api/payments/{everything}",
       "SwaggerKey": "payment",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ]
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ]
     },
     {
       "DownstreamPathTemplate": "/api/notifications",
@@ -197,7 +281,14 @@
       ],
       "UpstreamPathTemplate": "/api/notifications",
       "SwaggerKey": "notification",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -213,7 +304,14 @@
       ],
       "UpstreamPathTemplate": "/api/notifications/{everything}",
       "SwaggerKey": "notification",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+      ],
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }

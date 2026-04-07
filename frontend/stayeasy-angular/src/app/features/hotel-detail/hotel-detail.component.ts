@@ -1,8 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { forkJoin } from 'rxjs';
 import { SearchService } from '../../core/services/search.service';
 import { HotelService } from '../../core/services/hotel.service';
@@ -17,7 +22,18 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
 @Component({
   selector: 'app-hotel-detail',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, LoadingSpinnerComponent, StarRatingComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    LoadingSpinnerComponent,
+    StarRatingComponent
+  ],
   template: `
     <app-loading-spinner *ngIf="isLoading" [fullPage]="true"></app-loading-spinner>
 
@@ -33,7 +49,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
             <p class="location">{{ hotel.address }}, {{ hotel.city }}, {{ hotel.country }}</p>
             <div class="meta-row">
               <span>{{ rooms.length }} room types</span>
-              <span>{{ guests }} guest{{ guests > 1 ? 's' : '' }}</span>
+                <span>{{ selectedGuests }} guest{{ selectedGuests > 1 ? 's' : '' }}</span>
               <span>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
             </div>
           </div>
@@ -45,16 +61,83 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
             <p>{{ hotel.description || 'A refined stay with comfort-focused amenities and thoughtful service.' }}</p>
           </mat-card>
 
+          <mat-card class="booking-card" appearance="outlined">
+            <div class="booking-card-header">
+              <div>
+                <p class="eyebrow">Plan your booking</p>
+                <h2>Choose your dates before selecting a room</h2>
+                <p class="booking-note">Flexible plans, instant room hold, and secure checkout.</p>
+              </div>
+              <div class="booking-summary">
+                <span>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
+                <span>{{ selectedGuests }} guest{{ selectedGuests > 1 ? 's' : '' }}</span>
+              </div>
+            </div>
+
+            <form class="booking-form" [formGroup]="bookingForm">
+              <mat-form-field appearance="outline">
+                <mat-label>Check-in</mat-label>
+                <input matInput [matDatepicker]="checkInPicker" formControlName="checkIn" />
+                <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+                <mat-datepicker #checkInPicker></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Check-out</mat-label>
+                <input matInput [matDatepicker]="checkOutPicker" formControlName="checkOut" />
+                <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+                <mat-datepicker #checkOutPicker></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Guests</mat-label>
+                <input matInput type="number" min="1" formControlName="guests" />
+              </mat-form-field>
+            </form>
+
+            <div class="booking-recap">
+              <div class="recap-item">
+                <p>Check-in</p>
+                <strong>{{ selectedCheckIn | date: 'EEE, MMM d' }}</strong>
+              </div>
+              <div class="recap-item">
+                <p>Check-out</p>
+                <strong>{{ selectedCheckOut | date: 'EEE, MMM d' }}</strong>
+              </div>
+              <div class="recap-item">
+                <p>Stay</p>
+                <strong>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</strong>
+              </div>
+              <div class="recap-item">
+                <p>Guests</p>
+                <strong>{{ selectedGuests }}</strong>
+              </div>
+            </div>
+          </mat-card>
+
           <div class="rooms-heading">
             <h2>Choose Your Room</h2>
-            <p>Rates are per night and taxes are calculated at checkout.</p>
+            <p>
+              Rates are per night and taxes are calculated at checkout.
+              <span class="selected-window">{{ selectedCheckIn | date: 'MMM d' }} - {{ selectedCheckOut | date: 'MMM d, y' }}</span>
+            </p>
           </div>
 
           <div class="rooms-grid" *ngIf="rooms.length; else noRooms">
             <mat-card class="room-card" *ngFor="let room of rooms" appearance="outlined">
+              <div class="room-badges">
+                <span class="badge badge-highlight" *ngIf="isBestPrice(room)">Best price</span>
+                <span class="badge" [class.badge-low]="room.totalRooms <= 3">Only {{ room.totalRooms }} left</span>
+              </div>
+
               <div class="room-top">
                 <h3>{{ room.name }}</h3>
                 <p class="price">{{ room.pricePerNight | currency: 'INR':'symbol':'1.0-0' }} <span>/ night</span></p>
+              </div>
+
+              <div class="room-estimate">
+                <span class="estimate-label">Estimated total for {{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
+                <span class="estimate-value">{{ estimatedTotal(room) | currency: 'INR':'symbol':'1.0-0' }}</span>
               </div>
 
               <p class="room-description">{{ room.description }}</p>
@@ -65,7 +148,9 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
                 <span>{{ room.totalRooms }} rooms left</span>
               </div>
 
-              <button mat-flat-button color="primary" (click)="bookRoom(room)">Book this room</button>
+              <button mat-flat-button color="primary" (click)="bookRoom(room)">
+                Book for {{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}
+              </button>
             </mat-card>
           </div>
 
@@ -172,6 +257,101 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         backdrop-filter: blur(4px);
       }
 
+      .booking-card {
+        border-radius: 18px;
+        border-color: #cfe0f2;
+        padding: 20px;
+        margin-bottom: 24px;
+        background:
+          radial-gradient(circle at top right, rgba(5, 150, 105, 0.1), transparent 48%),
+          linear-gradient(140deg, rgba(15, 118, 110, 0.07), rgba(234, 179, 8, 0.06));
+      }
+
+      .booking-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.76rem;
+        color: #6d7fb8;
+        font-weight: 700;
+      }
+
+      .booking-card h2 {
+        margin: 0;
+        color: #0f355a;
+      }
+
+      .booking-note {
+        margin: 8px 0 0;
+        color: #45627d;
+        font-size: 0.94rem;
+      }
+
+      .booking-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .booking-summary span {
+        background: white;
+        color: #153e63;
+        border: 1px solid #d8e5f2;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .booking-form {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .booking-recap {
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .recap-item {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid #d4e2f0;
+        border-radius: 12px;
+        padding: 10px 12px;
+      }
+
+      .recap-item p {
+        margin: 0 0 4px;
+        color: #5e7289;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+      }
+
+      .recap-item strong {
+        color: #133f68;
+      }
+
+      .selected-window {
+        display: inline-block;
+        margin-left: 8px;
+        font-weight: 700;
+        color: #0f4c81;
+      }
+
       .about-card h2 {
         margin: 6px 0 8px;
         color: #0f355a;
@@ -200,6 +380,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
       .rooms-heading p {
         margin: 0;
         color: #5e7289;
+        line-height: 1.5;
       }
 
       .rooms-grid {
@@ -212,6 +393,40 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         border-radius: 16px;
         border-color: #cfe0f2;
         background: #fff;
+        box-shadow: 0 8px 24px rgba(15, 35, 56, 0.06);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(15, 35, 56, 0.1);
+        }
+      }
+
+      .room-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #4f5f72;
+        background: #edf3f9;
+      }
+
+      .badge-highlight {
+        color: #0f5b4f;
+        background: #d8f5e9;
+      }
+
+      .badge-low {
+        color: #9a3412;
+        background: #ffedd5;
       }
 
       .room-top {
@@ -231,6 +446,31 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         color: #4d6278;
         line-height: 1.5;
         min-height: 48px;
+      }
+
+      .room-estimate {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+        border: 1px solid rgba(102, 126, 234, 0.12);
+      }
+
+      .estimate-label {
+        color: #5e7289;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .estimate-value {
+        color: #0f4c81;
+        font-size: 1rem;
+        font-weight: 800;
+        white-space: nowrap;
       }
 
       .room-facts {
@@ -263,6 +503,8 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
       button[mat-flat-button] {
         width: 100%;
         border-radius: 10px;
+        margin-top: 4px;
+        min-height: 46px;
       }
 
       .empty-state {
@@ -294,11 +536,16 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         .room-description {
           min-height: 0;
         }
+
+        .booking-form {
+          grid-template-columns: 1fr;
+        }
       }
     `
   ]
 })
 export class HotelDetailComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly searchService = inject(SearchService);
@@ -310,20 +557,43 @@ export class HotelDetailComponent implements OnInit {
   hotel: Hotel | null = null;
   rooms: RoomType[] = [];
   isLoading = true;
-  stayNights = 1;
   fallbackImage = 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop';
 
-  private checkIn = '';
-  private checkOut = '';
-  guests = 1;
+  bookingForm = this.fb.group({
+    checkIn: [this.createDefaultCheckIn(), Validators.required],
+    checkOut: [this.createDefaultCheckOut(), Validators.required],
+    guests: [1, [Validators.required, Validators.min(1)]]
+  });
+
+  get selectedCheckIn(): Date {
+    return this.bookingForm.controls.checkIn.value ?? this.createDefaultCheckIn();
+  }
+
+  get selectedCheckOut(): Date {
+    return this.bookingForm.controls.checkOut.value ?? this.createDefaultCheckOut();
+  }
+
+  get selectedGuests(): number {
+    return this.bookingForm.controls.guests.value ?? 1;
+  }
+
+  get stayNights(): number {
+    return this.calculateNights(this.selectedCheckIn, this.selectedCheckOut);
+  }
 
   ngOnInit(): void {
     const hotelId = this.route.snapshot.paramMap.get('id');
-    this.checkIn = this.route.snapshot.queryParamMap.get('checkIn') ?? '';
-    this.checkOut = this.route.snapshot.queryParamMap.get('checkOut') ?? '';
-    this.guests = Number(this.route.snapshot.queryParamMap.get('guests') ?? 1);
-    this.normalizeStayWindow();
-    this.stayNights = this.calculateNights(this.checkIn, this.checkOut);
+    const checkIn = this.parseDateParam(this.route.snapshot.queryParamMap.get('checkIn')) ?? this.createDefaultCheckIn();
+    const checkOut = this.parseDateParam(this.route.snapshot.queryParamMap.get('checkOut')) ?? this.createDefaultCheckOut();
+    const guests = Number(this.route.snapshot.queryParamMap.get('guests') ?? 1);
+
+    this.bookingForm.patchValue({
+      checkIn,
+      checkOut,
+      guests: Number.isFinite(guests) && guests > 0 ? guests : 1
+    });
+
+    this.normalizeBookingWindow();
 
     if (!hotelId) {
       this.router.navigate(['/']);
@@ -355,9 +625,9 @@ export class HotelDetailComponent implements OnInit {
       return;
     }
 
-    this.normalizeStayWindow();
+    this.normalizeBookingWindow();
 
-    const nights = this.calculateNights(this.checkIn, this.checkOut);
+    const nights = this.calculateNights(this.selectedCheckIn, this.selectedCheckOut);
 
     this.bookingService
       .createHold({
@@ -365,9 +635,9 @@ export class HotelDetailComponent implements OnInit {
         roomTypeId: room.id,
         hotelName: this.hotel.name,
         roomTypeName: room.name,
-        checkIn: this.checkIn,
-        checkOut: this.checkOut,
-        guests: this.guests,
+        checkIn: this.toDateOnly(this.selectedCheckIn),
+        checkOut: this.toDateOnly(this.selectedCheckOut),
+        guests: this.selectedGuests,
         totalAmount: room.pricePerNight * nights
       })
       .subscribe({
@@ -380,46 +650,77 @@ export class HotelDetailComponent implements OnInit {
       });
   }
 
-  private normalizeStayWindow(): void {
+  private normalizeBookingWindow(): void {
+    const checkIn = new Date(this.selectedCheckIn);
+    checkIn.setHours(0, 0, 0, 0);
+
+    const checkOut = new Date(this.selectedCheckOut);
+    checkOut.setHours(0, 0, 0, 0);
+
+    if (checkOut <= checkIn) {
+      checkOut.setDate(checkIn.getDate() + 1);
+      this.bookingForm.patchValue({ checkOut }, { emitEvent: false });
+    }
+  }
+
+  private createDefaultCheckIn(): Date {
     const today = new Date();
-    const nextDay = new Date(today);
-    nextDay.setDate(today.getDate() + 1);
+    today.setHours(0, 0, 0, 0);
+    return today;
+  }
 
-    const checkInDate = new Date(this.checkIn);
-    const checkOutDate = new Date(this.checkOut);
-    const isCheckInValid = !Number.isNaN(checkInDate.getTime());
-    const isCheckOutValid = !Number.isNaN(checkOutDate.getTime());
+  private createDefaultCheckOut(): Date {
+    const nextDay = this.createDefaultCheckIn();
+    nextDay.setDate(nextDay.getDate() + 1);
+    return nextDay;
+  }
 
-    if (!isCheckInValid || !this.checkIn) {
-      this.checkIn = this.toDateOnly(today);
+  private parseDateParam(value: string | null): Date | null {
+    if (!value) {
+      return null;
     }
 
-    if (!isCheckOutValid || !this.checkOut) {
-      this.checkOut = this.toDateOnly(nextDay);
+    const [year, month, day] = value.split('-').map((part) => Number(part));
+
+    if ([year, month, day].some((part) => Number.isNaN(part))) {
+      return null;
     }
 
-    const normalizedIn = new Date(this.checkIn);
-    const normalizedOut = new Date(this.checkOut);
-
-    if (normalizedOut <= normalizedIn) {
-      normalizedOut.setDate(normalizedIn.getDate() + 1);
-      this.checkOut = this.toDateOnly(normalizedOut);
-    }
+    const date = new Date(year, month - 1, day);
+    date.setHours(0, 0, 0, 0);
+    return date;
   }
 
   private toDateOnly(date: Date): string {
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-    return local.toISOString().slice(0, 10);
+    const local = new Date(date);
+    local.setHours(0, 0, 0, 0);
+    return local.toISOString().split('T')[0];
   }
 
-  private calculateNights(checkIn: string, checkOut: string): number {
-    const inDate = new Date(checkIn).getTime();
-    const outDate = new Date(checkOut).getTime();
+  private calculateNights(checkIn: Date, checkOut: Date): number {
+    const normalizedIn = new Date(checkIn);
+    normalizedIn.setHours(0, 0, 0, 0);
 
-    if (Number.isNaN(inDate) || Number.isNaN(outDate) || outDate <= inDate) {
+    const normalizedOut = new Date(checkOut);
+    normalizedOut.setHours(0, 0, 0, 0);
+
+    if (normalizedOut <= normalizedIn) {
       return 1;
     }
 
-    return Math.ceil((outDate - inDate) / 86_400_000);
+    return Math.ceil((normalizedOut.getTime() - normalizedIn.getTime()) / 86_400_000);
+  }
+
+  estimatedTotal(room: RoomType): number {
+    return room.pricePerNight * this.stayNights;
+  }
+
+  isBestPrice(room: RoomType): boolean {
+    if (!this.rooms.length) {
+      return false;
+    }
+
+    const lowest = Math.min(...this.rooms.map((item) => item.pricePerNight));
+    return room.pricePerNight === lowest;
   }
 }

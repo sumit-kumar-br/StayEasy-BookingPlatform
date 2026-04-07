@@ -3,13 +3,16 @@
   align-items: center;
   gap: 4px;
 
-  mat-icon {
+  .star {
     color: #cbd5e1;
     font-size: 18px;
     width: 18px;
     height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
-    letter-spacing: 0;
+    line-height: 1;
   }
 
   .filled {

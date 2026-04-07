@@ -1,11 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { BookingService } from '../../../core/services/booking.service';
 import { Booking } from '../../../models/booking.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
@@ -14,13 +12,17 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 @Component({
   selector: 'app-my-bookings',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule, MatChipsModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatDialogModule, StatusBadgeComponent],
   template: `
     <section class="container">
       <div class="page-header">
         <div class="header-content">
           <h1>My Bookings</h1>
           <p class="subtitle">View and manage all your hotel reservations</p>
+          <div class="header-stats" *ngIf="bookings.length">
+            <span class="stat-pill"><strong>{{ bookings.length }}</strong> total</span>
+            <span class="stat-pill"><strong>{{ upcomingBookings }}</strong> upcoming</span>
+          </div>
         </div>
       </div>
 
@@ -62,25 +64,30 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 
               <div class="detail-row">
                 <div class="detail-item">
-                  <mat-icon>calendar_today</mat-icon>
+                  <span class="item-icon" aria-hidden="true">📅</span>
                   <div class="date-range">
                     <span class="label">Check-in</span>
                     <span class="value">{{ booking.checkIn | date: 'MMM dd, yyyy' }}</span>
                   </div>
                 </div>
                 <div class="detail-item">
-                  <mat-icon>event_note</mat-icon>
+                  <span class="item-icon" aria-hidden="true">🗓</span>
                   <div class="date-range">
                     <span class="label">Check-out</span>
                     <span class="value">{{ booking.checkOut | date: 'MMM dd, yyyy' }}</span>
                   </div>
                 </div>
               </div>
+
+              <div class="booking-meta">
+                <span>{{ getStayNights(booking) }} night{{ getStayNights(booking) > 1 ? 's' : '' }}</span>
+                <span>Guest: {{ booking.guestName }}</span>
+              </div>
             </div>
 
             <div class="booking-actions">
               <button mat-stroked-button color="primary" (click)="viewDetails(booking.id)">
-                <mat-icon>visibility</mat-icon>
+                <span class="button-icon" aria-hidden="true">↗</span>
                 View Details
               </button>
               <button 
@@ -88,7 +95,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
                 color="warn" 
                 *ngIf="canCancel(booking)" 
                 (click)="cancelBooking(booking.id)">
-                <mat-icon>close</mat-icon>
+                <span class="button-icon" aria-hidden="true">×</span>
                 Cancel Booking
               </button>
             </div>
@@ -127,6 +134,25 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
         font-size: 1.1rem;
         opacity: 0.95;
         font-weight: 300;
+      }
+
+      .header-stats {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stat-pill {
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.88rem;
+      }
+
+      .stat-pill strong {
+        font-size: 0.95rem;
       }
 
       .bookings-content {
@@ -175,12 +201,15 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
       }
 
       .booking-card {
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 24px;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background:
+          radial-gradient(circle at top right, rgba(102, 126, 234, 0.08), transparent 36%),
+          #ffffff;
+        box-shadow: 0 8px 24px rgba(11, 28, 45, 0.1);
         transition: all 0.3s ease;
-        border-left: 4px solid #667eea;
+        border: 1px solid #d8e4f1;
+        border-left: 5px solid #667eea;
 
         &:hover {
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -237,10 +266,16 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
         align-items: flex-start;
         gap: 12px;
 
-        mat-icon {
+        .item-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           color: #667eea;
-          margin-top: 2px;
+          margin-top: 1px;
           flex-shrink: 0;
+          width: 20px;
+          font-size: 1rem;
+          line-height: 1;
         }
 
         .label {
@@ -265,6 +300,22 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
         flex-grow: 1;
       }
 
+      .booking-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .booking-meta span {
+        background: #eef4fb;
+        color: #355372;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+
       .booking-actions {
         display: flex;
         gap: 12px;
@@ -276,8 +327,10 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
           min-height: 40px;
           font-weight: 500;
 
-          mat-icon {
+          .button-icon {
             margin-right: 8px;
+            line-height: 1;
+            font-weight: 700;
           }
         }
       }
@@ -290,6 +343,10 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 
         .header-content h1 {
           font-size: 2rem;
+        }
+
+        .header-stats {
+          margin-top: 12px;
         }
 
         .booking-card {
@@ -330,6 +387,21 @@ export class MyBookingsComponent implements OnInit {
 
   bookings: Booking[] = [];
 
+  get upcomingBookings(): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.bookings.filter((booking) => {
+      if (booking.status === 'Cancelled') {
+        return false;
+      }
+
+      const checkOut = new Date(booking.checkOut);
+      checkOut.setHours(0, 0, 0, 0);
+      return !Number.isNaN(checkOut.getTime()) && checkOut >= today;
+    }).length;
+  }
+
   ngOnInit(): void {
     this.loadBookings();
   }
@@ -342,6 +414,24 @@ export class MyBookingsComponent implements OnInit {
 
   canCancel(booking: Booking): boolean {
     return booking.status === 'Pending' || booking.status === 'Confirmed';
+  }
+
+  getStayNights(booking: Booking): number {
+    const checkIn = new Date(booking.checkIn);
+    const checkOut = new Date(booking.checkOut);
+
+    if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
+      return 1;
+    }
+
+    checkIn.setHours(0, 0, 0, 0);
+    checkOut.setHours(0, 0, 0, 0);
+
+    if (checkOut <= checkIn) {
+      return 1;
+    }
+
+    return Math.ceil((checkOut.getTime() - checkIn.getTime()) / 86_400_000);
   }
 
   viewDetails(id: string): void {

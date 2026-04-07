@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -507,15 +508,48 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             this.notification.success('Payment successful. Booking confirmed.');
             this.router.navigate(['/booking-confirmation', booking.id]);
           },
-          error: () => {
+          error: (error: HttpErrorResponse) => {
             this.isProcessingPayment = false;
             if (this.processingWatchdog) {
               clearTimeout(this.processingWatchdog);
             }
-            this.notification.error('Unable to confirm booking right now. Please try again.');
+
+            const reason = this.readApiErrorMessage(error);
+            this.notification.error(reason);
+
+            if (reason.includes('Hold has expired') || reason.includes('Hold not found or already released')) {
+              this.router.navigate(['/hotels/search']);
+            }
           }
         });
     }, 700);
+  }
+
+  private readApiErrorMessage(error: HttpErrorResponse): string {
+    const payload = error.error as
+      | { message?: string; errors?: string[] | Record<string, string[]> }
+      | undefined;
+
+    if (typeof payload?.message === 'string' && payload.message.trim()) {
+      return payload.message;
+    }
+
+    if (Array.isArray(payload?.errors) && payload.errors.length > 0) {
+      return payload.errors[0];
+    }
+
+    if (payload?.errors && typeof payload.errors === 'object') {
+      const first = Object.values(payload.errors)[0];
+      if (Array.isArray(first) && first.length > 0) {
+        return first[0];
+      }
+    }
+
+    if (error.status === 400) {
+      return 'Booking request was rejected. Your hold may have expired; please reselect the room.';
+    }
+
+    return 'Unable to confirm booking right now. Please try again.';
   }
 
   private startTimer(): void {

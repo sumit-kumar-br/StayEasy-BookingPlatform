@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StayEasy.Hotel.Models;
 using HotelModel = StayEasy.Hotel.Models.Hotel;
 

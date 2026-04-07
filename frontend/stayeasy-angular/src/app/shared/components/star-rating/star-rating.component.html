@@ -1,3 +1,3 @@
 <div class="stars">
-  <mat-icon *ngFor="let star of stars" [class.filled]="star <= rating">star</mat-icon>
+  <span class="star" *ngFor="let star of stars" [class.filled]="star <= rating" aria-hidden="true">★</span>
 </div>

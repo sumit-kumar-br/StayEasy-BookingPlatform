@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { BookingService } from '../../core/services/booking.service';
 import { Booking } from '../../models/booking.model';
@@ -13,11 +12,11 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
 @Component({
   selector: 'app-booking-confirmation',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatDialogModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatDialogModule, StatusBadgeComponent],
   template: `
     <section class="confirmation-container" *ngIf="booking">
       <div class="success-section">
-        <mat-icon class="success-icon">check_circle</mat-icon>
+        <span class="success-icon" aria-hidden="true">✔</span>
         <h1 class="success-title">Booking Confirmed!</h1>
         <p class="success-message">Your reservation has been successfully booked</p>
       </div>
@@ -48,14 +47,14 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
               <h3>Stay Dates</h3>
               <div class="detail-grid">
                 <div class="detail-item">
-                  <mat-icon>calendar_today</mat-icon>
+                  <span class="icon-glyph" aria-hidden="true">📅</span>
                   <div>
                     <span class="label">Check-in</span>
                     <span class="value">{{ booking.checkIn | date: 'MMMM dd, yyyy' }}</span>
                   </div>
                 </div>
                 <div class="detail-item">
-                  <mat-icon>event_note</mat-icon>
+                  <span class="icon-glyph" aria-hidden="true">🗓</span>
                   <div>
                     <span class="label">Check-out</span>
                     <span class="value">{{ booking.checkOut | date: 'MMMM dd, yyyy' }}</span>
@@ -95,7 +94,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
             *ngIf="canCancel(booking)" 
             (click)="cancelBooking()"
             class="action-btn">
-            <mat-icon>close</mat-icon>
+            <span class="button-icon" aria-hidden="true">×</span>
             Cancel Booking
           </button>
           <button 
@@ -103,13 +102,13 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
             color="primary" 
             routerLink="/dashboard/bookings"
             class="action-btn">
-            <mat-icon>list_alt</mat-icon>
+            <span class="button-icon" aria-hidden="true">☰</span>
             View My Bookings
           </button>
         </div>
 
         <div class="info-box">
-          <mat-icon>info</mat-icon>
+          <span class="info-icon" aria-hidden="true">i</span>
           <div>
             <strong>What's Next?</strong>
             <p>You'll receive a confirmation email shortly. You can view and manage all your bookings from your dashboard.</p>
@@ -133,10 +132,14 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
       }
 
       .success-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         font-size: 80px;
         width: 80px;
         height: 80px;
         color: #10b981;
+        line-height: 1;
         animation: scaleIn 0.6s ease;
       }
 
@@ -230,10 +233,16 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
         align-items: flex-start;
         gap: 12px;
 
-        mat-icon {
+        .icon-glyph {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           color: #667eea;
           flex-shrink: 0;
-          margin-top: 2px;
+          margin-top: 1px;
+          width: 22px;
+          font-size: 1.1rem;
+          line-height: 1;
         }
 
         .label {
@@ -300,8 +309,12 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
           padding: 0 24px;
           font-weight: 500;
 
-          mat-icon {
+          .button-icon {
+            display: inline-block;
             margin-right: 8px;
+            font-size: 1rem;
+            line-height: 1;
+            font-weight: 700;
           }
         }
       }
@@ -315,11 +328,17 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
         gap: 16px;
         color: white;
 
-        mat-icon {
+        .info-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
-          font-size: 28px;
+          font-size: 1rem;
+          font-weight: 700;
           width: 28px;
           height: 28px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.8);
         }
 
         strong {
@@ -373,7 +392,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
         .info-box {
           flex-direction: column;
 
-          mat-icon {
+          .info-icon {
             margin-bottom: 8px;
           }
         }

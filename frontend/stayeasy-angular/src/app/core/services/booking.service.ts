@@ -64,6 +64,12 @@ export class BookingService {
       .pipe(map((res) => res.data));
   }
 
+  confirmBookingAsManager(id: string): Observable<unknown> {
+    return this.http
+      .post<ApiResponse<unknown>>(`${environment.bookingApiUrl}/bookings/${id}/manager-confirm`, {})
+      .pipe(map((res) => res.data));
+  }
+
   getMyBookings(): Observable<Booking[]> {
     return this.http
       .get<ApiResponse<Booking[]>>(`${environment.bookingApiUrl}/bookings/my`)

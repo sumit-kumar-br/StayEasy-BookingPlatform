@@ -44,14 +44,21 @@ import { AdminUser, UserRole } from '../../models/user.model';
             </mat-card>
           </div>
 
-          <div class="actions-row">
-            <button mat-raised-button color="primary" routerLink="/">
-              <span class="icon">🔍</span> Search Hotels
-            </button>
-            <button mat-raised-button routerLink="/dashboard/bookings">
-              <span class="icon">📖</span> My Bookings
-            </button>
-          </div>
+          <section class="roles-section" aria-label="Traveler responsibilities">
+            <div class="roles-grid">
+              <mat-card *ngFor="let roleCard of travelerRoleCards" class="role-card">
+                <div class="role-header">
+                  <span class="role-icon" aria-hidden="true">{{ roleCard.icon }}</span>
+                  <span class="role-badge">{{ roleCard.badge }}</span>
+                  <h4>{{ roleCard.name }}</h4>
+                </div>
+                <p class="role-summary">{{ roleCard.summary }}</p>
+                <button mat-raised-button color="primary" [routerLink]="roleCard.route">
+                  {{ roleCard.actionLabel }}
+                </button>
+              </mat-card>
+            </div>
+          </section>
         </ng-container>
 
         <ng-container *ngSwitchCase="roleEnum.HotelManager">
@@ -73,17 +80,24 @@ import { AdminUser, UserRole } from '../../models/user.model';
             </mat-card>
           </div>
 
-          <div class="actions-row">
-            <button mat-raised-button color="primary" routerLink="/manager/hotels/new">
-              <span class="icon">➕</span> Add Hotel
-            </button>
-            <button mat-raised-button routerLink="/manager/hotels">
-              <span class="icon">⚙️</span> Manage Hotels
-            </button>
-            <button mat-raised-button routerLink="/manager/bookings">
-              <span class="icon">📝</span> Incoming Bookings
-            </button>
-          </div>
+          <section class="roles-section" aria-label="Recommended manager responsibilities">
+            <h3 class="section-title">Recommended Manager Roles</h3>
+            <p class="roles-subtitle">Focus on listings, guest operations, and booking response for smooth property management.</p>
+
+            <div class="roles-grid">
+              <mat-card *ngFor="let roleCard of managerRoleCards" class="role-card">
+                <div class="role-header">
+                  <span class="role-icon" aria-hidden="true">{{ roleCard.icon }}</span>
+                  <span class="role-badge">{{ roleCard.badge }}</span>
+                  <h4>{{ roleCard.name }}</h4>
+                </div>
+                <p class="role-summary">{{ roleCard.summary }}</p>
+                <button mat-raised-button color="primary" [routerLink]="roleCard.route">
+                  {{ roleCard.actionLabel }}
+                </button>
+              </mat-card>
+            </div>
+          </section>
         </ng-container>
 
         <ng-container *ngSwitchCase="roleEnum.Admin">
@@ -105,31 +119,6 @@ import { AdminUser, UserRole } from '../../models/user.model';
             </mat-card>
           </div>
 
-          <div class="actions-row">
-            <button mat-raised-button color="primary" routerLink="/admin/hotels">
-              <span class="icon">📋</span> Review Hotels
-            </button>
-            <button mat-raised-button routerLink="/admin/users">
-              <span class="icon">👤</span> Manage Users
-            </button>
-            <button mat-raised-button routerLink="/admin/dashboard">
-              <span class="icon">📊</span> Admin Dashboard
-            </button>
-            <button mat-raised-button routerLink="/">
-              <span class="icon">🏠</span> Go Home
-            </button>
-          </div>
-
-          <section class="quick-nav" aria-label="Admin quick navigation">
-            <h3 class="section-title">Quick Navigation</h3>
-            <div class="quick-nav-links">
-              <a routerLink="/admin/hotels">📋 Hotel Approvals</a>
-              <a routerLink="/admin/users">👤 User Governance</a>
-              <a routerLink="/admin/dashboard">📊 Platform Dashboard</a>
-              <a routerLink="/workspace">🏠 Workspace Home</a>
-            </div>
-          </section>
-
           <section class="roles-section" aria-label="Recommended admin responsibilities">
             <h3 class="section-title">Recommended Admin Roles</h3>
             <p class="roles-subtitle">Split responsibilities across focused admin tracks for optimal oversight.</p>
@@ -137,6 +126,8 @@ import { AdminUser, UserRole } from '../../models/user.model';
             <div class="roles-grid">
               <mat-card *ngFor="let roleCard of adminRoleCards" class="role-card">
                 <div class="role-header">
+                  <span class="role-icon" aria-hidden="true">{{ roleCard.icon }}</span>
+                  <span class="role-badge">{{ roleCard.badge }}</span>
                   <h4>{{ roleCard.name }}</h4>
                 </div>
                 <p class="role-summary">{{ roleCard.summary }}</p>
@@ -295,45 +286,6 @@ import { AdminUser, UserRole } from '../../models/user.model';
         color: #0f2742;
       }
 
-      .quick-nav {
-        margin: 40px 0;
-        padding: 32px;
-        background: linear-gradient(135deg, #f8fafc 0%, #f0f4fa 100%);
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-      }
-
-      .quick-nav-links {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-      }
-
-      .quick-nav-links a {
-        text-decoration: none;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        padding: 12px 16px;
-        color: #0f2742;
-        background: white;
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-align: center;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .quick-nav-links a:hover {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-      }
-
       .roles-section {
         margin-top: 40px;
       }
@@ -361,6 +313,7 @@ import { AdminUser, UserRole } from '../../models/user.model';
         flex-direction: column;
         position: relative;
         overflow: hidden;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
       }
 
       .role-card::before {
@@ -381,6 +334,35 @@ import { AdminUser, UserRole } from '../../models/user.model';
 
       .role-header {
         margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 12px;
+        row-gap: 10px;
+        align-items: center;
+      }
+
+      .role-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #667eea1f 0%, #764ba21f 100%);
+        border: 1px solid #d4def9;
+      }
+
+      .role-badge {
+        justify-self: end;
+        border-radius: 999px;
+        padding: 6px 12px;
+        background: #eef2ff;
+        color: #4c5ecb;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
       }
 
       .role-header h4 {
@@ -388,6 +370,7 @@ import { AdminUser, UserRole } from '../../models/user.model';
         font-size: 1.2rem;
         font-weight: 700;
         color: #0f2742;
+        grid-column: 1 / -1;
       }
 
       .role-summary {
@@ -404,6 +387,7 @@ import { AdminUser, UserRole } from '../../models/user.model';
         font-weight: 600;
         transition: all 0.2s ease;
         align-self: flex-start;
+        min-height: 42px;
       }
 
       .role-card button:hover {
@@ -455,16 +439,6 @@ import { AdminUser, UserRole } from '../../models/user.model';
           font-size: 0.95rem;
         }
 
-        .quick-nav {
-          margin: 32px 0;
-          padding: 24px;
-        }
-
-        .quick-nav-links {
-          grid-template-columns: 1fr;
-          gap: 12px;
-        }
-
         .roles-grid {
           grid-template-columns: 1fr;
           gap: 16px;
@@ -472,6 +446,15 @@ import { AdminUser, UserRole } from '../../models/user.model';
 
         .role-card {
           padding: 24px 20px;
+        }
+
+        .role-header {
+          row-gap: 8px;
+        }
+
+        .role-badge {
+          font-size: 0.72rem;
+          padding: 5px 10px;
         }
 
         .section-title {
@@ -497,21 +480,81 @@ export class WorkspaceComponent implements OnInit {
   readonly adminRoleCards = [
     {
       name: 'User Governance Admin',
+      icon: '🛡️',
+      badge: 'Trust & Safety',
       summary: 'Verify users, handle ban and unban actions, and keep account access compliant.',
       route: '/admin/users',
       actionLabel: 'Open User Controls'
     },
     {
       name: 'Hotel Moderation Admin',
+      icon: '🏨',
+      badge: 'Quality Control',
       summary: 'Approve or reject listings and maintain quality standards across hotels.',
       route: '/admin/hotels',
       actionLabel: 'Review Hotel Queue'
     },
     {
       name: 'Platform Operations Admin',
+      icon: '📈',
+      badge: 'Insights',
       summary: 'Track growth metrics, pending workload, and operational visibility.',
       route: '/admin/dashboard',
       actionLabel: 'View Control Center'
+    }
+  ];
+
+  readonly travelerRoleCards = [
+    {
+      name: 'Discovery Traveler',
+      icon: '🔍',
+      badge: 'Explore',
+      summary: 'Search hotels by destination, dates, and guest count to find the right stay quickly.',
+      route: '/',
+      actionLabel: 'Search Hotels'
+    },
+    {
+      name: 'Booking Traveler',
+      icon: '📖',
+      badge: 'Trips',
+      summary: 'Review your current and past reservations, payment status, and booking confirmations.',
+      route: '/dashboard/bookings',
+      actionLabel: 'My Bookings'
+    },
+    {
+      name: 'Planning Traveler',
+      icon: '✈️',
+      badge: 'Upcoming',
+      summary: 'Track your upcoming trips and prepare the next stay with a clear overview of bookings.',
+      route: '/dashboard',
+      actionLabel: 'Open Dashboard'
+    }
+  ];
+
+  readonly managerRoleCards = [
+    {
+      name: 'Property Setup Manager',
+      icon: '➕',
+      badge: 'Onboarding',
+      summary: 'Add new hotels and complete listings so properties are ready for review and approval.',
+      route: '/manager/hotels/new',
+      actionLabel: 'Add New Hotel'
+    },
+    {
+      name: 'Inventory Manager',
+      icon: '⚙️',
+      badge: 'Operations',
+      summary: 'Manage hotel details and room inventory to keep pricing and availability accurate.',
+      route: '/manager/hotels',
+      actionLabel: 'Manage Properties'
+    },
+    {
+      name: 'Reservation Manager',
+      icon: '📝',
+      badge: 'Guest Flow',
+      summary: 'Review incoming bookings and respond quickly to traveler reservations and requests.',
+      route: '/manager/bookings',
+      actionLabel: 'Handle Bookings'
     }
   ];
 

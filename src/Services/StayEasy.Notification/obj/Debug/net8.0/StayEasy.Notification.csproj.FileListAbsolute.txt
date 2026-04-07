@@ -323,10 +323,10 @@ C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notificat
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\staticwebassets.development.json
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\swae.build.ex.cache
-C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\StayEasy.6E9B3EB1.Up2Date
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\StayEasy.Notification.dll
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\refint\StayEasy.Notification.dll
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\StayEasy.Notification.pdb
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\StayEasy.Notification.genruntimeconfig.cache
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\ref\StayEasy.Notification.dll
+C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Notification\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

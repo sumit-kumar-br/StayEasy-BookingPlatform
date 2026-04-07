@@ -60,6 +60,15 @@ namespace StayEasy.Booking.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
+        [HttpPost("{bookingId}/manager-confirm")]
+        [Authorize(Roles = "HotelManager")]
+        public async Task<IActionResult> ConfirmBookingAsManager(Guid bookingId)
+        {
+            var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _bookingService.ConfirmBookingAsManagerAsync(bookingId, managerId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         [HttpGet("my")]
         public async Task<IActionResult> GetMyBookings()
         {

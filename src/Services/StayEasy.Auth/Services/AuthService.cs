@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using StayEasy.Auth.Data;
 using StayEasy.Auth.DTOs;

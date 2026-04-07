@@ -1,4 +1,4 @@
-﻿using StayEasy.Shared.Enums;
+using StayEasy.Shared.Enums;
 
 namespace StayEasy.Auth.Models
 {

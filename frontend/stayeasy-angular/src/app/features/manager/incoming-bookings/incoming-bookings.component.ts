@@ -33,8 +33,11 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
               <h3>{{ booking.bookingRef }}</h3>
               <app-status-badge [status]="booking.status"></app-status-badge>
             </div>
-            <div class="action-button" *ngIf="canCancel(booking)">
-              <button mat-stroked-button color="warn" (click)="cancelAsManager(booking.id)">
+            <div class="action-button" *ngIf="canAct(booking)">
+              <button mat-stroked-button color="primary" *ngIf="canConfirm(booking)" (click)="confirmAsManager(booking.id)">
+                ✓ Confirm
+              </button>
+              <button mat-stroked-button color="warn" *ngIf="canCancel(booking)" (click)="cancelAsManager(booking.id)">
                 ✕ Cancel
               </button>
             </div>
@@ -253,8 +256,24 @@ export class IncomingBookingsComponent implements OnInit {
     });
   }
 
+  canAct(booking: Booking): boolean {
+    return this.canConfirm(booking) || this.canCancel(booking);
+  }
+
+  canConfirm(booking: Booking): boolean {
+    return booking.status === 'Pending';
+  }
+
   canCancel(booking: Booking): boolean {
     return booking.status === 'Pending' || booking.status === 'Confirmed';
+  }
+
+  confirmAsManager(id: string): void {
+    this.bookingService.confirmBookingAsManager(id).subscribe(() => {
+      this.bookingService.getIncomingBookings().subscribe((bookings) => {
+        this.bookings = bookings;
+      });
+    });
   }
 
   cancelAsManager(id: string): void {

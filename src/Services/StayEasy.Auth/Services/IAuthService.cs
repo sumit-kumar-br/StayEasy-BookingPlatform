@@ -1,4 +1,4 @@
-﻿using StayEasy.Auth.DTOs;
+using StayEasy.Auth.DTOs;
 using StayEasy.Shared.Common;
 
 namespace StayEasy.Auth.Services

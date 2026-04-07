@@ -9,6 +9,7 @@ namespace StayEasy.Booking.Services
         Task<ApiResponse<HoldResponseDto>> GetHoldAsync(Guid holdId);
         Task<ApiResponse<bool>> ReleaseHoldAsync(Guid holdId);
         Task<ApiResponse<BookingResponseDto>> ConfirmBookingAsync(CreateBookingDto dto, Guid travelerId);
+        Task<ApiResponse<bool>> ConfirmBookingAsManagerAsync(Guid bookingId, Guid managerId);
         Task<ApiResponse<bool>> CancelBookingAsync(Guid bookingId, Guid travelerId);
         Task<ApiResponse<bool>> CancelBookingAsManagerAsync(Guid bookingId, Guid managerId);
         Task<ApiResponse<List<BookingResponseDto>>> GetMyBookingsAsync(Guid travelerId);

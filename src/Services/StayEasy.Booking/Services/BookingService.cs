@@ -88,8 +88,26 @@ namespace StayEasy.Booking.Services
         {
             var hold = await _db.HoldRecords.FindAsync(dto.HoldId);
 
-            if (hold == null || hold.IsReleased)
+            if (hold == null)
                 return ApiResponse<BookingResponseDto>.Fail("Hold not found or already released.");
+
+            if (hold.IsReleased)
+            {
+                // Idempotent retry: if booking was already created from this hold details, return it.
+                var existingBooking = await _db.Bookings
+                    .Where(b => b.TravelerId == travelerId &&
+                                b.HotelId == hold.HotelId &&
+                                b.RoomTypeId == hold.RoomTypeId &&
+                                b.CheckIn == hold.CheckIn &&
+                                b.CheckOut == hold.CheckOut)
+                    .OrderByDescending(b => b.CreatedAt)
+                    .FirstOrDefaultAsync();
+
+                if (existingBooking != null)
+                    return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(existingBooking));
+
+                return ApiResponse<BookingResponseDto>.Fail("Hold not found or already released.");
+            }
 
             if (hold.ExpiresAt < DateTime.UtcNow)
                 return ApiResponse<BookingResponseDto>.Fail("Hold has expired. Please select your room again.");
@@ -115,7 +133,7 @@ namespace StayEasy.Booking.Services
                 Guests = hold.Guests,
                 TotalAmount = hold.TotalAmount,
                 SpecialRequests = dto.SpecialRequests,
-                Status = BookingStatus.Pending // becomes Confirmed after payment
+                Status = BookingStatus.Confirmed
             };
 
             _db.Bookings.Add(booking);
@@ -124,20 +142,53 @@ namespace StayEasy.Booking.Services
             hold.IsReleased = true;
             await _db.SaveChangesAsync();
 
-            await _publishEndpoint.Publish(new BookingCreatedEvent
+            try
             {
-                EventId = Guid.NewGuid(),
-                OccurredAtUtc = DateTime.UtcNow,
-                CorrelationId = booking.BookingRef,
-                BookingId = booking.Id,
-                UserId = travelerId,
-                Email = booking.GuestEmail,
-                HotelName = booking.HotelName,
-                CheckInUtc = booking.CheckIn,
-                CheckOutUtc = booking.CheckOut
-            });
+                await _publishEndpoint.Publish(new BookingCreatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OccurredAtUtc = DateTime.UtcNow,
+                    CorrelationId = booking.BookingRef,
+                    BookingId = booking.Id,
+                    UserId = travelerId,
+                    Email = booking.GuestEmail,
+                    HotelName = booking.HotelName,
+                    CheckInUtc = booking.CheckIn,
+                    CheckOutUtc = booking.CheckOut
+                });
+            }
+            catch
+            {
+                // Do not fail booking confirmation if notification infrastructure is temporarily unavailable.
+            }
 
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
+        }
+
+        public async Task<ApiResponse<bool>> ConfirmBookingAsManagerAsync(Guid bookingId, Guid managerId)
+        {
+            var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+
+            if (booking == null)
+                throw new NotFoundException("Booking", bookingId);
+
+            var isManagedByRequester = await IsHotelOwnedByManagerAsync(booking.HotelId, managerId);
+            if (!isManagedByRequester)
+                return ApiResponse<bool>.Fail("You can confirm bookings only for your hotels.");
+
+            if (booking.Status == BookingStatus.Confirmed)
+                return ApiResponse<bool>.Fail("Booking is already confirmed.");
+
+            if (booking.Status == BookingStatus.Cancelled ||
+                booking.Status == BookingStatus.CheckedIn ||
+                booking.Status == BookingStatus.CheckedOut ||
+                booking.Status == BookingStatus.NoShow)
+                return ApiResponse<bool>.Fail("This booking can no longer be confirmed.");
+
+            booking.Status = BookingStatus.Confirmed;
+            await _db.SaveChangesAsync();
+
+            return ApiResponse<bool>.Ok(true, "Booking confirmed successfully.");
         }
         public async Task<ApiResponse<bool>> CancelBookingAsync(Guid bookingId, Guid travelerId)
         {
@@ -158,7 +209,26 @@ namespace StayEasy.Booking.Services
             _db.Bookings.Remove(booking);
             await _db.SaveChangesAsync();
 
-            // TODO Day 5: publish BookingCancelledEvent for refund + notification
+            try
+            {
+                await _publishEndpoint.Publish(new BookingCancelledEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OccurredAtUtc = DateTime.UtcNow,
+                    CorrelationId = booking.BookingRef,
+                    BookingId = booking.Id,
+                    UserId = travelerId,
+                    Email = booking.GuestEmail,
+                    HotelName = booking.HotelName,
+                    RoomTypeName = booking.RoomTypeName,
+                    CheckInUtc = booking.CheckIn,
+                    CheckOutUtc = booking.CheckOut,
+                    CancelledBy = "Traveler"
+                });
+            }
+            catch
+            {
+            }
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
         }
@@ -184,6 +254,27 @@ namespace StayEasy.Booking.Services
 
             _db.Bookings.Remove(booking);
             await _db.SaveChangesAsync();
+
+            try
+            {
+                await _publishEndpoint.Publish(new BookingCancelledEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OccurredAtUtc = DateTime.UtcNow,
+                    CorrelationId = booking.BookingRef,
+                    BookingId = booking.Id,
+                    UserId = booking.TravelerId,
+                    Email = booking.GuestEmail,
+                    HotelName = booking.HotelName,
+                    RoomTypeName = booking.RoomTypeName,
+                    CheckInUtc = booking.CheckIn,
+                    CheckOutUtc = booking.CheckOut,
+                    CancelledBy = "Hotel Manager"
+                });
+            }
+            catch
+            {
+            }
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
         }
