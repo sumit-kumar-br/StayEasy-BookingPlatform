@@ -7,4 +7,6 @@
   <Project Path="src/Services/StayEasy.Payment/StayEasy.Payment.csproj" />
   <Project Path="src/Services/StayEasy.Search/StayEasy.Search.csproj" />
   <Project Path="src/Shared/StayEasy.Shared/StayEasy.Shared.csproj" />
+  <Project Path="tests/StayEasy.Booking.Tests/StayEasy.Booking.Tests.csproj" />
+  <Project Path="tests/StayEasy.Auth.Tests/StayEasy.Auth.Tests.csproj" />
 </Solution>

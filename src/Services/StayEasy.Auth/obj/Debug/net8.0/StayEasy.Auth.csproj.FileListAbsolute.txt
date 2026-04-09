@@ -700,4 +700,3 @@ c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check-manager-mails\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check-manager-mails\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check-manager-mails\StayEasy.Shared.pdb
-C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

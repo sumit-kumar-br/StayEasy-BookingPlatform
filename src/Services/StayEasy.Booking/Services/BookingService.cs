@@ -303,6 +303,9 @@ namespace StayEasy.Booking.Services
                 booking.Status == BookingStatus.NoShow)
                 return ApiResponse<bool>.Fail("This booking can no longer be cancelled.");
 
+            if (DateTime.UtcNow.Date >= booking.CheckIn.Date)
+                return ApiResponse<bool>.Fail("Booking cannot be cancelled on or after check-in date.");
+
             _db.Bookings.Remove(booking);
             await _db.SaveChangesAsync();
 

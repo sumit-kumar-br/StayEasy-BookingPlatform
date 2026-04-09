@@ -265,7 +265,24 @@ export class IncomingBookingsComponent implements OnInit {
   }
 
   canCancel(booking: Booking): boolean {
-    return booking.status === 'Pending' || booking.status === 'Confirmed';
+    const cancellableStatus = booking.status === 'Pending' || booking.status === 'Confirmed';
+
+    if (!cancellableStatus) {
+      return false;
+    }
+
+    const checkIn = new Date(booking.checkIn);
+    if (Number.isNaN(checkIn.getTime())) {
+      return false;
+    }
+
+    checkIn.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Hide manager cancel option once check-in date has arrived.
+    return checkIn > today;
   }
 
   confirmAsManager(id: string): void {

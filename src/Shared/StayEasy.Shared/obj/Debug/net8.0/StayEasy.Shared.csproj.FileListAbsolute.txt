@@ -99,3 +99,9 @@ c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Hotel\bin
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Hotel\bin\build-check-swagger-upload-fix\StayEasy.Shared.deps.json
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Hotel\bin\build-check-swagger-upload-fix\StayEasy.Shared.dll
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Hotel\bin\build-check-swagger-upload-fix\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\artifacts\hotel-testsDebug\net8.0\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\artifacts\hotel-testsDebug\net8.0\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\artifacts\hotel-testsDebug\net8.0\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check-manager-cancel-checkin-rule\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check-manager-cancel-checkin-rule\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check-manager-cancel-checkin-rule\StayEasy.Shared.pdb

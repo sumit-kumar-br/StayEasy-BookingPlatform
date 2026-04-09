@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9654f385e010f4c9196247e61eace5e448e4fb02")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bca24d69fdf2f5a5b7819aa3489a4db46f68d495")]
 [assembly: System.Reflection.AssemblyProductAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StayEasy.Auth")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
