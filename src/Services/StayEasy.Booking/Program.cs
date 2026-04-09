@@ -4,7 +4,6 @@ using StayEasy.Booking.Data;
 using StayEasy.Booking.Services;
 using StayEasy.Shared.Exceptions;
 using StayEasy.Shared.JWT;
-using StackExchange.Redis;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,11 +23,6 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
 // Services
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-{
-    var redisConnection = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false";
-    return ConnectionMultiplexer.Connect(redisConnection);
-});
 
 builder.Services.AddMassTransit(x =>
 {
@@ -107,7 +101,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();

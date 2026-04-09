@@ -39,3 +39,15 @@ C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.deps.json
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.dll
 c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check2\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check2\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check2\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check2\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check2\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Auth\bin\build-check2\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check3\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check3\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check3\StayEasy.Shared.pdb
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\build-check3\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\build-check3\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\bin\build-check3\StayEasy.Shared.pdb

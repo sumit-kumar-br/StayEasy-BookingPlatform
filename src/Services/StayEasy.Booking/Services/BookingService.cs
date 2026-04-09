@@ -8,7 +8,6 @@ using StayEasy.Shared.Common;
 using StayEasy.Shared.Contracts.Notifications;
 using StayEasy.Shared.Enums;
 using StayEasy.Shared.Exceptions;
-using StackExchange.Redis;
 using BookingModel = StayEasy.Booking.Models.Booking;
 
 namespace StayEasy.Booking.Services
@@ -18,17 +17,11 @@ namespace StayEasy.Booking.Services
         private readonly BookingDbContext _db;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConnectionMultiplexer _redis;
-        public BookingService(
-            BookingDbContext db,
-            IPublishEndpoint publishEndpoint,
-            IHttpClientFactory httpClientFactory,
-            IConnectionMultiplexer redis)
+        public BookingService(BookingDbContext db, IPublishEndpoint publishEndpoint, IHttpClientFactory httpClientFactory)
         {
             _db = db;
             _publishEndpoint = publishEndpoint;
             _httpClientFactory = httpClientFactory;
-            _redis = redis;
         }
         public async Task<ApiResponse<HoldResponseDto>> CreateHoldAsync(CreateHoldDto dto, Guid travelerId)
         {
@@ -38,11 +31,6 @@ namespace StayEasy.Booking.Services
                 return ApiResponse<HoldResponseDto>.Fail("Check-out must be after check-in.");
 
             var requestedUnits = NormalizeRequestedUnits(dto.Guests);
-            var lockKey = BuildInventoryLockKey(dto.RoomTypeId, dto.CheckIn, dto.CheckOut);
-
-            await using var lockHandle = await TryAcquireLockAsync(lockKey, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(2));
-            if (lockHandle == null)
-                return ApiResponse<HoldResponseDto>.Fail("Room is being reserved right now. Please retry in a moment.");
 
             var totalUnits = await GetRoomTypeCapacityAsync(dto.HotelId, dto.RoomTypeId);
             if (!totalUnits.HasValue || totalUnits.Value <= 0)
@@ -139,11 +127,6 @@ namespace StayEasy.Booking.Services
 
             if (hold.TravelerId != travelerId)
                 throw new UnauthorizedException();
-
-            var lockKey = BuildInventoryLockKey(hold.RoomTypeId, hold.CheckIn, hold.CheckOut);
-            await using var lockHandle = await TryAcquireLockAsync(lockKey, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(2));
-            if (lockHandle == null)
-                return ApiResponse<BookingResponseDto>.Fail("Room is being reserved right now. Please retry in a moment.");
 
             var totalUnits = await GetRoomTypeCapacityAsync(hold.HotelId, hold.RoomTypeId);
             if (!totalUnits.HasValue || totalUnits.Value <= 0)
@@ -456,47 +439,6 @@ namespace StayEasy.Booking.Services
         private sealed class ApiEnvelope<T>
         {
             public T? Data { get; set; }
-        }
-
-        private sealed class RedisLockHandle : IAsyncDisposable
-        {
-            private readonly IDatabase _database;
-            private readonly RedisKey _key;
-            private readonly RedisValue _token;
-
-            public RedisLockHandle(IDatabase database, string key, string token)
-            {
-                _database = database;
-                _key = key;
-                _token = token;
-            }
-
-            public async ValueTask DisposeAsync()
-            {
-                const string releaseScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-                await _database.ScriptEvaluateAsync(releaseScript, new RedisKey[] { _key }, new RedisValue[] { _token });
-            }
-        }
-
-        private static string BuildInventoryLockKey(Guid roomTypeId, DateTime checkIn, DateTime checkOut) =>
-            $"booking:lock:{roomTypeId:N}:{checkIn:yyyyMMdd}:{checkOut:yyyyMMdd}";
-
-        private async Task<RedisLockHandle?> TryAcquireLockAsync(string key, TimeSpan lease, TimeSpan wait)
-        {
-            var token = Guid.NewGuid().ToString("N");
-            var db = _redis.GetDatabase();
-            var deadline = DateTime.UtcNow.Add(wait);
-
-            while (DateTime.UtcNow < deadline)
-            {
-                var acquired = await db.StringSetAsync(key, token, lease, When.NotExists);
-                if (acquired)
-                    return new RedisLockHandle(db, key, token);
-
-                await Task.Delay(100);
-            }
-
-            return null;
         }
 
         private static int NormalizeRequestedUnits(int value) => value > 0 ? value : 1;
