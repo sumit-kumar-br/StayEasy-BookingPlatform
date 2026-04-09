@@ -408,7 +408,11 @@ export class MyBookingsComponent implements OnInit {
 
   loadBookings(): void {
     this.bookingService.getMyBookings().subscribe((bookings) => {
-      this.bookings = bookings;
+      this.bookings = bookings.sort((a, b) => {
+        const dateA = new Date(a.checkIn).getTime();
+        const dateB = new Date(b.checkIn).getTime();
+        return dateB - dateA; // Decreasing order (most recent first)
+      });
     });
   }
 

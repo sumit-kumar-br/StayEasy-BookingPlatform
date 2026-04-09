@@ -49,6 +49,15 @@ export class HotelService {
       .pipe(map((res) => res.data));
   }
 
+  uploadRoomPhoto(roomTypeId: string, file: File): Observable<unknown> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http
+      .post<ApiResponse<unknown>>(`${environment.hotelApiUrl}/rooms/${roomTypeId}/photo`, formData)
+      .pipe(map((res) => res.data));
+  }
+
   approveHotel(id: string): Observable<unknown> {
     return this.http
       .patch<ApiResponse<unknown>>(`${environment.hotelApiUrl}/hotels/${id}/approve`, {})

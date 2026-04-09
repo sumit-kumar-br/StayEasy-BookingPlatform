@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HotelService } from '../../../core/services/hotel.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { RoomType } from '../../../models/room-type.model';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
@@ -84,6 +85,24 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
               </button>
             </div>
             <p class="room-desc">{{ room.description }}</p>
+
+            <div class="room-photo" *ngIf="room.photoUrl">
+              <img [src]="room.photoUrl" [alt]="room.name" />
+            </div>
+
+            <div class="room-photo-upload">
+              <input
+                type="file"
+                accept="image/*"
+                [id]="'room-photo-' + room.id"
+                (change)="onRoomFileSelected(room.id, $event)"
+              />
+              <button mat-stroked-button color="primary" (click)="uploadRoomPhoto(room.id)">
+                Upload Room Photo
+              </button>
+              <p class="file-hint" *ngIf="selectedRoomFiles[room.id]">Selected: {{ selectedRoomFiles[room.id]?.name }}</p>
+            </div>
+
             <div class="room-stats">
               <div class="stat">
                 <span class="label">Occupancy</span>
@@ -302,6 +321,34 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
         line-height: 1.5;
       }
 
+      .room-photo {
+        margin: 0 0 12px;
+      }
+
+      .room-photo img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .room-photo-upload {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .room-photo-upload input[type='file'] {
+        font-size: 0.85rem;
+      }
+
+      .file-hint {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.8rem;
+      }
+
       .room-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -411,9 +458,11 @@ export class ManageRoomsComponent implements OnInit {
   private readonly hotelService = inject(HotelService);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
+  private readonly notification = inject(NotificationService);
 
   hotelId = '';
   rooms: RoomType[] = [];
+  selectedRoomFiles: Record<string, File | null> = {};
 
   form = this.fb.group({
     name: ['', Validators.required],
@@ -436,6 +485,31 @@ export class ManageRoomsComponent implements OnInit {
 
     this.hotelService.getRoomTypes(this.hotelId).subscribe((rooms) => {
       this.rooms = rooms;
+      const known = new Set(rooms.map((r) => r.id));
+      for (const key of Object.keys(this.selectedRoomFiles)) {
+        if (!known.has(key)) {
+          delete this.selectedRoomFiles[key];
+        }
+      }
+    });
+  }
+
+  onRoomFileSelected(roomTypeId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedRoomFiles[roomTypeId] = input.files?.[0] ?? null;
+  }
+
+  uploadRoomPhoto(roomTypeId: string): void {
+    const file = this.selectedRoomFiles[roomTypeId];
+    if (!file) {
+      this.notification.error('Please choose a room photo first.');
+      return;
+    }
+
+    this.hotelService.uploadRoomPhoto(roomTypeId, file).subscribe(() => {
+      this.notification.success('Room photo uploaded successfully.');
+      this.selectedRoomFiles[roomTypeId] = null;
+      this.loadRooms();
     });
   }
 

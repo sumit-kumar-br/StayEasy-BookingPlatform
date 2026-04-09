@@ -82,7 +82,7 @@ import { NotificationService } from '../../../core/services/notification.service
         <p class="section-subtitle">Upload hotel photos to showcase your property</p>
         
         <div class="photo-upload">
-          <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput />
+          <input id="file-input" type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput />
           <label for="file-input" class="file-label">
             <span>📁 Choose Photo</span>
           </label>
@@ -360,6 +360,8 @@ export class EditHotelComponent implements OnInit {
     this.hotelService.uploadPhoto(this.hotelId, this.selectedFile).subscribe(() => {
       this.notification.success('Photo uploaded successfully.');
       this.selectedFile = null;
+    }, () => {
+      this.notification.error('Photo upload failed. Please try again.');
     });
   }
 }
