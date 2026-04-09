@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StayEasy.Notification")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+35659224c322a72d1696c2545742337ee22985a7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63fc41e468d93bbe9b0acbbbfe10d3070cf3ced4")]
 [assembly: System.Reflection.AssemblyProductAttribute("StayEasy.Notification")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StayEasy.Notification")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -25,21 +25,22 @@ namespace StayEasy.Booking.Services
         }
         public async Task<ApiResponse<HoldResponseDto>> CreateHoldAsync(CreateHoldDto dto, Guid travelerId)
         {
-            // Release any existing expired holds for this traveler + room
-            var expiredHolds = await _db.HoldRecords.Where(h => h.TravelerId == travelerId &&
-                                                     h.RoomTypeId == dto.RoomTypeId &&
-                                                     !h.IsReleased && h.ExpiresAt < DateTime.UtcNow).ToListAsync();
-            foreach (var expired in expiredHolds)
-                expired.IsReleased = true;
+            await ReleaseExpiredHoldsAsync();
 
-            // Check if room is already held by someone else
-            var activeHold = await _db.HoldRecords.AnyAsync(h=>h.RoomTypeId == dto.RoomTypeId &&
-                                                            !h.IsReleased &&
-                                                            h.ExpiresAt > DateTime.UtcNow &&
-                                                            h.CheckIn < dto.CheckOut &&
-                                                            h.CheckOut > dto.CheckIn);
-            if (activeHold)
-                return ApiResponse<HoldResponseDto>.Fail("This room is currently being booked by someone else. Please try again in a few minutes.");
+            if (dto.CheckOut <= dto.CheckIn)
+                return ApiResponse<HoldResponseDto>.Fail("Check-out must be after check-in.");
+
+            var requestedUnits = NormalizeRequestedUnits(dto.Guests);
+
+            var totalUnits = await GetRoomTypeCapacityAsync(dto.HotelId, dto.RoomTypeId);
+            if (!totalUnits.HasValue || totalUnits.Value <= 0)
+                return ApiResponse<HoldResponseDto>.Fail("Unable to verify room inventory right now. Please try again.");
+
+            var reservedUnits = await GetReservedUnitsAsync(dto.RoomTypeId, dto.CheckIn, dto.CheckOut);
+            var availableUnits = Math.Max(0, totalUnits.Value - reservedUnits);
+
+            if (requestedUnits > availableUnits)
+                return ApiResponse<HoldResponseDto>.Fail($"Only {availableUnits} room(s) are available for the selected dates.");
 
             var hold = new HoldRecord
             {
@@ -50,7 +51,7 @@ namespace StayEasy.Booking.Services
                 RoomTypeName = dto.RoomTypeName,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
-                Guests = dto.Guests,
+                Guests = requestedUnits,
                 TotalAmount = dto.TotalAmount,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(10)
             };
@@ -62,13 +63,19 @@ namespace StayEasy.Booking.Services
         }
         public async Task<ApiResponse<HoldResponseDto>> GetHoldAsync(Guid holdId)
         {
+            await ReleaseExpiredHoldsAsync();
+
             var hold = await _db.HoldRecords.FindAsync(holdId);
 
             if (hold == null || hold.IsReleased)
                 throw new NotFoundException("Hold", holdId);
 
             if (hold.ExpiresAt < DateTime.UtcNow)
+            {
+                hold.IsReleased = true;
+                await _db.SaveChangesAsync();
                 return ApiResponse<HoldResponseDto>.Fail("Hold has expired. Please select your room again.");
+            }
 
             return ApiResponse<HoldResponseDto>.Ok(MapHoldToDto(hold));
         }
@@ -86,6 +93,8 @@ namespace StayEasy.Booking.Services
         }
         public async Task<ApiResponse<BookingResponseDto>> ConfirmBookingAsync(CreateBookingDto dto, Guid travelerId)
         {
+            await ReleaseExpiredHoldsAsync();
+
             var hold = await _db.HoldRecords.FindAsync(dto.HoldId);
 
             if (hold == null)
@@ -110,10 +119,24 @@ namespace StayEasy.Booking.Services
             }
 
             if (hold.ExpiresAt < DateTime.UtcNow)
+            {
+                hold.IsReleased = true;
+                await _db.SaveChangesAsync();
                 return ApiResponse<BookingResponseDto>.Fail("Hold has expired. Please select your room again.");
+            }
 
             if (hold.TravelerId != travelerId)
                 throw new UnauthorizedException();
+
+            var totalUnits = await GetRoomTypeCapacityAsync(hold.HotelId, hold.RoomTypeId);
+            if (!totalUnits.HasValue || totalUnits.Value <= 0)
+                return ApiResponse<BookingResponseDto>.Fail("Unable to verify room inventory right now. Please try again.");
+
+            var reservedExcludingThisHold = await GetReservedUnitsAsync(hold.RoomTypeId, hold.CheckIn, hold.CheckOut, hold.Id);
+            var holdUnits = NormalizeRequestedUnits(hold.Guests);
+
+            if (holdUnits + reservedExcludingThisHold > totalUnits.Value)
+                return ApiResponse<BookingResponseDto>.Fail("Selected room inventory changed. Please try again.");
 
             // Generate booking reference
             var bookingRef = $"STY-{DateTime.UtcNow.Year}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";
@@ -280,6 +303,8 @@ namespace StayEasy.Booking.Services
         }
         public async Task<ApiResponse<List<BookingResponseDto>>> GetMyBookingsAsync(Guid travelerId)
         {
+            await ReleaseExpiredHoldsAsync();
+
             var cancelledBookings = await _db.Bookings
                 .Where(b => b.TravelerId == travelerId && b.Status == BookingStatus.Cancelled)
                 .ToListAsync();
@@ -308,6 +333,8 @@ namespace StayEasy.Booking.Services
 
         public async Task<ApiResponse<List<BookingResponseDto>>> GetIncomingBookingsAsync()
         {
+            await ReleaseExpiredHoldsAsync();
+
             var cancelledBookings = await _db.Bookings
                 .Where(b => b.Status == BookingStatus.Cancelled)
                 .ToListAsync();
@@ -324,6 +351,35 @@ namespace StayEasy.Booking.Services
                 .ToListAsync();
 
             return ApiResponse<List<BookingResponseDto>>.Ok(bookings.Select(MapBookingToDto).ToList());
+        }
+
+        public async Task<ApiResponse<List<RoomAvailabilityDto>>> GetRoomAvailabilityAsync(Guid hotelId, DateTime checkIn, DateTime checkOut)
+        {
+            await ReleaseExpiredHoldsAsync();
+
+            if (checkOut <= checkIn)
+                return ApiResponse<List<RoomAvailabilityDto>>.Fail("Check-out must be after check-in.");
+
+            var roomTypes = await GetRoomTypesForHotelAsync(hotelId);
+
+            if (roomTypes == null)
+                return ApiResponse<List<RoomAvailabilityDto>>.Ok(new List<RoomAvailabilityDto>(), "Room availability is temporarily unavailable.");
+
+            var result = new List<RoomAvailabilityDto>(roomTypes.Count);
+
+            foreach (var room in roomTypes.Where(r => r.IsActive && r.TotalRooms > 0))
+            {
+                var reserved = await GetReservedUnitsAsync(room.Id, checkIn, checkOut);
+                result.Add(new RoomAvailabilityDto
+                {
+                    RoomTypeId = room.Id,
+                    TotalUnits = room.TotalRooms,
+                    ReservedUnits = reserved,
+                    AvailableUnits = Math.Max(0, room.TotalRooms - reserved)
+                });
+            }
+
+            return ApiResponse<List<RoomAvailabilityDto>>.Ok(result);
         }
 
         private static HoldResponseDto MapHoldToDto(HoldRecord hold) => new()
@@ -383,6 +439,89 @@ namespace StayEasy.Booking.Services
         private sealed class ApiEnvelope<T>
         {
             public T? Data { get; set; }
+        }
+
+        private static int NormalizeRequestedUnits(int value) => value > 0 ? value : 1;
+
+        private async Task ReleaseExpiredHoldsAsync()
+        {
+            var now = DateTime.UtcNow;
+
+            var expiredHolds = await _db.HoldRecords
+                .Where(h => !h.IsReleased && h.ExpiresAt <= now)
+                .ToListAsync();
+
+            if (expiredHolds.Count == 0)
+                return;
+
+            foreach (var hold in expiredHolds)
+                hold.IsReleased = true;
+
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task<int?> GetRoomTypeCapacityAsync(Guid hotelId, Guid roomTypeId)
+        {
+            var roomTypes = await GetRoomTypesForHotelAsync(hotelId);
+            var roomType = roomTypes?.FirstOrDefault(r => r.Id == roomTypeId && r.IsActive);
+            return roomType?.TotalRooms;
+        }
+
+        private async Task<List<RoomTypeCapacityDto>?> GetRoomTypesForHotelAsync(Guid hotelId)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"http://localhost:5062/api/rooms?hotelId={hotelId}";
+
+            try
+            {
+                var response = await client.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var payload = await response.Content.ReadFromJsonAsync<ApiResponse<List<RoomTypeCapacityDto>>>();
+                return payload?.Data;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private async Task<int> GetReservedUnitsAsync(Guid roomTypeId, DateTime checkIn, DateTime checkOut, Guid? excludeHoldId = null)
+        {
+            var now = DateTime.UtcNow;
+
+            var activeHoldQuery = _db.HoldRecords.Where(h =>
+                h.RoomTypeId == roomTypeId &&
+                !h.IsReleased &&
+                h.ExpiresAt > now &&
+                h.CheckIn < checkOut &&
+                h.CheckOut > checkIn);
+
+            if (excludeHoldId.HasValue)
+                activeHoldQuery = activeHoldQuery.Where(h => h.Id != excludeHoldId.Value);
+
+            var heldUnits = await activeHoldQuery.SumAsync(h => h.Guests > 0 ? h.Guests : 1);
+
+            var bookedUnits = await _db.Bookings
+                .Where(b =>
+                    b.RoomTypeId == roomTypeId &&
+                    b.Status != BookingStatus.Cancelled &&
+                    b.Status != BookingStatus.CheckedOut &&
+                    b.Status != BookingStatus.NoShow &&
+                    b.CheckOut > now &&
+                    b.CheckIn < checkOut &&
+                    b.CheckOut > checkIn)
+                .SumAsync(b => b.Guests > 0 ? b.Guests : 1);
+
+            return heldUnits + bookedUnits;
+        }
+
+        private sealed class RoomTypeCapacityDto
+        {
+            public Guid Id { get; set; }
+            public int TotalRooms { get; set; }
+            public bool IsActive { get; set; }
         }
 
         private sealed class HotelOwnershipDto

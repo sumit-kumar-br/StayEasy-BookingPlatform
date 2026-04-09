@@ -49,7 +49,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
             <p class="location">{{ hotel.address }}, {{ hotel.city }}, {{ hotel.country }}</p>
             <div class="meta-row">
               <span>{{ rooms.length }} room types</span>
-                <span>{{ selectedGuests }} guest{{ selectedGuests > 1 ? 's' : '' }}</span>
+                <span>{{ selectedRooms }} room{{ selectedRooms > 1 ? 's' : '' }}</span>
               <span>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
             </div>
           </div>
@@ -70,7 +70,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
               </div>
               <div class="booking-summary">
                 <span>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
-                <span>{{ selectedGuests }} guest{{ selectedGuests > 1 ? 's' : '' }}</span>
+                <span>{{ selectedRooms }} room{{ selectedRooms > 1 ? 's' : '' }}</span>
               </div>
             </div>
 
@@ -90,7 +90,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Guests</mat-label>
+                <mat-label>No. of rooms</mat-label>
                 <input matInput type="number" min="1" formControlName="guests" />
               </mat-form-field>
             </form>
@@ -109,8 +109,8 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
                 <strong>{{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</strong>
               </div>
               <div class="recap-item">
-                <p>Guests</p>
-                <strong>{{ selectedGuests }}</strong>
+                <p>Rooms</p>
+                <strong>{{ selectedRooms }}</strong>
               </div>
             </div>
           </mat-card>
@@ -127,7 +127,9 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
             <mat-card class="room-card" *ngFor="let room of rooms" appearance="outlined">
               <div class="room-badges">
                 <span class="badge badge-highlight" *ngIf="isBestPrice(room)">Best price</span>
-                <span class="badge" [class.badge-low]="room.totalRooms <= 3">Only {{ room.totalRooms }} left</span>
+                <span class="badge" [class.badge-low]="getAvailableRooms(room) <= 3" [class.badge-out]="getAvailableRooms(room) === 0">
+                  {{ getAvailabilityLabel(room) }}
+                </span>
               </div>
 
               <div class="room-top">
@@ -136,21 +138,23 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
               </div>
 
               <div class="room-estimate">
-                <span class="estimate-label">Estimated total for {{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
+                <span class="estimate-label">Estimated total for {{ selectedRooms }} room{{ selectedRooms > 1 ? 's' : '' }} and {{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}</span>
                 <span class="estimate-value">{{ estimatedTotal(room) | currency: 'INR':'symbol':'1.0-0' }}</span>
               </div>
 
               <p class="room-description">{{ room.description }}</p>
 
-              <div class="room-facts">
-                <span>Up to {{ room.maxOccupancy }} guests</span>
-                <span>{{ room.bedConfiguration }}</span>
-                <span>{{ room.totalRooms }} rooms left</span>
-              </div>
+              <div class="room-footer">
+                <div class="room-facts">
+                  <span>Up to {{ room.maxOccupancy }} guests</span>
+                  <span>{{ room.bedConfiguration }}</span>
+                  <span>{{ getAvailableRooms(room) }} rooms left</span>
+                </div>
 
-              <button mat-flat-button color="primary" (click)="bookRoom(room)">
-                Book for {{ stayNights }} night{{ stayNights > 1 ? 's' : '' }}
-              </button>
+                <button mat-flat-button color="primary" [disabled]="!canBook(room)" (click)="bookRoom(room)">
+                  {{ getBookingButtonText(room) }}
+                </button>
+              </div>
             </mat-card>
           </div>
 
@@ -385,16 +389,21 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
 
       .rooms-grid {
         display: grid;
-        gap: 16px;
+        gap: 18px;
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        max-width: 1080px;
+        margin: 0 auto;
       }
 
       .room-card {
         border-radius: 16px;
         border-color: #cfe0f2;
         background: #fff;
-        box-shadow: 0 8px 24px rgba(15, 35, 56, 0.06);
+        box-shadow: 0 10px 26px rgba(15, 35, 56, 0.07);
         transition: transform 0.25s ease, box-shadow 0.25s ease;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
 
         &:hover {
           transform: translateY(-4px);
@@ -406,7 +415,7 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-bottom: 12px;
+        margin-bottom: 2px;
       }
 
       .badge {
@@ -429,6 +438,11 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         background: #ffedd5;
       }
 
+      .badge-out {
+        color: #7f1d1d;
+        background: #fee2e2;
+      }
+
       .room-top {
         display: flex;
         justify-content: space-between;
@@ -442,10 +456,10 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
       }
 
       .room-description {
-        margin: 10px 0 12px;
+        margin: 2px 0;
         color: #4d6278;
         line-height: 1.5;
-        min-height: 48px;
+        min-height: 0;
       }
 
       .room-estimate {
@@ -453,8 +467,8 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         justify-content: space-between;
         align-items: center;
         gap: 12px;
-        margin-bottom: 12px;
-        padding: 10px 12px;
+        margin-bottom: 2px;
+        padding: 12px 14px;
         border-radius: 12px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
         border: 1px solid rgba(102, 126, 234, 0.12);
@@ -473,18 +487,24 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
         white-space: nowrap;
       }
 
-      .room-facts {
+      .room-footer {
         display: grid;
         gap: 8px;
-        margin-bottom: 14px;
+      }
+
+      .room-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .room-facts span {
         color: #27425f;
         background: #eff5fb;
         border-radius: 10px;
-        padding: 6px 10px;
-        font-size: 0.9rem;
+        padding: 6px 11px;
+        font-size: 0.86rem;
+        font-weight: 600;
       }
 
       .price {
@@ -502,9 +522,14 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
 
       button[mat-flat-button] {
         width: 100%;
-        border-radius: 10px;
-        margin-top: 4px;
+        border-radius: 12px;
+        margin-top: 2px;
         min-height: 46px;
+      }
+
+      button[mat-flat-button][disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
       }
 
       .empty-state {
@@ -537,6 +562,11 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
           min-height: 0;
         }
 
+        .room-estimate {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
         .booking-form {
           grid-template-columns: 1fr;
         }
@@ -556,6 +586,7 @@ export class HotelDetailComponent implements OnInit {
 
   hotel: Hotel | null = null;
   rooms: RoomType[] = [];
+  availableByRoomType: Record<string, number> = {};
   isLoading = true;
   fallbackImage = 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop';
 
@@ -573,7 +604,7 @@ export class HotelDetailComponent implements OnInit {
     return this.bookingForm.controls.checkOut.value ?? this.createDefaultCheckOut();
   }
 
-  get selectedGuests(): number {
+  get selectedRooms(): number {
     return this.bookingForm.controls.guests.value ?? 1;
   }
 
@@ -607,6 +638,9 @@ export class HotelDetailComponent implements OnInit {
       next: ({ hotel, rooms }) => {
         this.hotel = hotel;
         this.rooms = rooms;
+        this.refreshAvailability();
+        this.bookingForm.controls.checkIn.valueChanges.subscribe(() => this.refreshAvailability());
+        this.bookingForm.controls.checkOut.valueChanges.subscribe(() => this.refreshAvailability());
         this.isLoading = false;
       },
       error: () => {
@@ -617,6 +651,11 @@ export class HotelDetailComponent implements OnInit {
 
   bookRoom(room: RoomType): void {
     if (!this.hotel) {
+      return;
+    }
+
+    if (!this.canBook(room)) {
+      this.notification.info('Selected room count is not available for these dates.');
       return;
     }
 
@@ -637,8 +676,8 @@ export class HotelDetailComponent implements OnInit {
         roomTypeName: room.name,
         checkIn: this.toDateOnly(this.selectedCheckIn),
         checkOut: this.toDateOnly(this.selectedCheckOut),
-        guests: this.selectedGuests,
-        totalAmount: room.pricePerNight * nights
+        guests: this.selectedRooms,
+        totalAmount: room.pricePerNight * nights * this.selectedRooms
       })
       .subscribe({
         next: (hold) => {
@@ -712,7 +751,33 @@ export class HotelDetailComponent implements OnInit {
   }
 
   estimatedTotal(room: RoomType): number {
-    return room.pricePerNight * this.stayNights;
+    return room.pricePerNight * this.stayNights * this.selectedRooms;
+  }
+
+  getAvailableRooms(room: RoomType): number {
+    return this.availableByRoomType[room.id] ?? room.totalRooms;
+  }
+
+  canBook(room: RoomType): boolean {
+    return this.getAvailableRooms(room) >= this.selectedRooms;
+  }
+
+  getBookingButtonText(room: RoomType): string {
+    if (!this.canBook(room)) {
+      return 'Not available for selected rooms';
+    }
+
+    return `Book ${this.selectedRooms} room${this.selectedRooms > 1 ? 's' : ''} for ${this.stayNights} night${this.stayNights > 1 ? 's' : ''}`;
+  }
+
+  getAvailabilityLabel(room: RoomType): string {
+    const available = this.getAvailableRooms(room);
+
+    if (available === 0) {
+      return 'Sold out';
+    }
+
+    return `Only ${available} left`;
   }
 
   isBestPrice(room: RoomType): boolean {
@@ -722,5 +787,27 @@ export class HotelDetailComponent implements OnInit {
 
     const lowest = Math.min(...this.rooms.map((item) => item.pricePerNight));
     return room.pricePerNight === lowest;
+  }
+
+  private refreshAvailability(): void {
+    if (!this.hotel) {
+      return;
+    }
+
+    this.normalizeBookingWindow();
+
+    this.bookingService
+      .getRoomAvailability(this.hotel.id, this.toDateOnly(this.selectedCheckIn), this.toDateOnly(this.selectedCheckOut))
+      .subscribe({
+        next: (availability) => {
+          this.availableByRoomType = availability.reduce<Record<string, number>>((map, item) => {
+            map[item.roomTypeId] = item.availableUnits;
+            return map;
+          }, {});
+        },
+        error: () => {
+          this.availableByRoomType = {};
+        }
+      });
   }
 }

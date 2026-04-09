@@ -91,5 +91,13 @@ namespace StayEasy.Booking.Controllers
             var result = await _bookingService.GetIncomingBookingsAsync();
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpGet("availability")]
+        public async Task<IActionResult> GetAvailability([FromQuery] Guid hotelId, [FromQuery] DateTime checkIn, [FromQuery] DateTime checkOut)
+        {
+            var result = await _bookingService.GetRoomAvailabilityAsync(hotelId, checkIn, checkOut);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
     }
 }

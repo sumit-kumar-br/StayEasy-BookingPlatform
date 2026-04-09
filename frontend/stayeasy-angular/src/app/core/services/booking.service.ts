@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../models/api-response.model';
-import { Booking, ConfirmBookingRequest, CreateHoldRequest, Hold } from '../../models/booking.model';
+import { Booking, ConfirmBookingRequest, CreateHoldRequest, Hold, RoomAvailability } from '../../models/booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -85,6 +85,14 @@ export class BookingService {
   getIncomingBookings(): Observable<Booking[]> {
     return this.http
       .get<ApiResponse<Booking[]>>(`${environment.bookingApiUrl}/bookings/incoming`)
+      .pipe(map((res) => res.data ?? []));
+  }
+
+  getRoomAvailability(hotelId: string, checkIn: string, checkOut: string): Observable<RoomAvailability[]> {
+    return this.http
+      .get<ApiResponse<RoomAvailability[]>>(
+        `${environment.bookingApiUrl}/bookings/availability?hotelId=${hotelId}&checkIn=${checkIn}&checkOut=${checkOut}`
+      )
       .pipe(map((res) => res.data ?? []));
   }
 }

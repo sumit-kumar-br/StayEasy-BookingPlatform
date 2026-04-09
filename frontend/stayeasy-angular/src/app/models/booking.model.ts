@@ -54,3 +54,10 @@ export interface ConfirmBookingRequest {
   guestEmail: string;
   specialRequests?: string;
 }
+
+export interface RoomAvailability {
+  roomTypeId: string;
+  totalUnits: number;
+  reservedUnits: number;
+  availableUnits: number;
+}

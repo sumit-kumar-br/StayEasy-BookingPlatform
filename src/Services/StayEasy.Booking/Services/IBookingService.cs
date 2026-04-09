@@ -15,5 +15,6 @@ namespace StayEasy.Booking.Services
         Task<ApiResponse<List<BookingResponseDto>>> GetMyBookingsAsync(Guid travelerId);
         Task<ApiResponse<BookingResponseDto>> GetBookingByIdAsync(Guid bookingId, Guid travelerId);
         Task<ApiResponse<List<BookingResponseDto>>> GetIncomingBookingsAsync();
+        Task<ApiResponse<List<RoomAvailabilityDto>>> GetRoomAvailabilityAsync(Guid hotelId, DateTime checkIn, DateTime checkOut);
     }
 }
