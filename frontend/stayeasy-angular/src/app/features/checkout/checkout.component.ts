@@ -121,7 +121,7 @@ import { Hold } from '../../models/booking.model';
           </button>
 
           <p class="security-note">
-            <mat-icon>lock</mat-icon>
+            <span class="lock-icon" aria-hidden="true">🔒</span>
             Your payment information is secure and encrypted
           </p>
         </form>
@@ -336,6 +336,11 @@ import { Hold } from '../../models/booking.model';
         align-items: center;
         justify-content: center;
         gap: 8px;
+
+        .lock-icon {
+          font-size: 18px;
+          color: #16a34a;
+        }
 
         mat-icon {
           font-size: 18px;

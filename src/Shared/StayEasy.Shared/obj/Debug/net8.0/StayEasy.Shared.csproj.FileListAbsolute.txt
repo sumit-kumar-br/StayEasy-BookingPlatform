@@ -36,3 +36,6 @@ C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\refint\StayEasy.Shared.dll
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\StayEasy.Shared.pdb
 C:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Shared\StayEasy.Shared\obj\Debug\net8.0\ref\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.deps.json
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.dll
+c:\CS\StayEasy Platform\StayEasy-BookingPlatform\src\Services\StayEasy.Booking\bin\build-check\StayEasy.Shared.pdb

@@ -186,11 +186,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/bookings",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7120
+          "Port": 5267
         }
       ],
       "UpstreamPathTemplate": "/api/bookings",
@@ -209,11 +209,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/bookings/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7120
+          "Port": 5267
         }
       ],
       "UpstreamPathTemplate": "/api/bookings/{everything}",
