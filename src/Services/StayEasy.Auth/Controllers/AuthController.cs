@@ -65,6 +65,14 @@ namespace StayEasy.Auth.Controllers
             return Ok(result);
         }
 
+        [HttpGet("internal/users/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserContact(Guid userId)
+        {
+            var result = await _authService.GetUserContactAsync(userId);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
         [HttpPatch("users/{userId}/ban")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> BanUser(Guid userId)

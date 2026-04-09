@@ -20,7 +20,7 @@ namespace StayEasy.Hotel.Controllers
         [Authorize(Roles = "HotelManager")]
         public async Task<IActionResult> CreateRoomType(Guid hotelId, [FromBody] CreateRoomTypeDto dto)
         {
-            var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _roomService.CreateRoomTypeAsync(hotelId, dto, managerId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -36,6 +36,15 @@ namespace StayEasy.Hotel.Controllers
         {
             var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _roomService.DeleteRoomTypeAsync(roomTypeId, managerId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpPost("{roomTypeId}/photo")]
+        [Authorize(Roles = "HotelManager")]
+        public async Task<IActionResult> UploadRoomPhoto(Guid roomTypeId, [FromForm] PhotoUploadRequestDto request)
+        {
+            var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _roomService.UploadPhotoAsync(roomTypeId, request.File, managerId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }

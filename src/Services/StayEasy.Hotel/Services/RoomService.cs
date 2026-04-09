@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using StayEasy.Hotel.Data;
 using StayEasy.Hotel.DTOs;
 using StayEasy.Hotel.Models;
@@ -10,9 +12,12 @@ namespace StayEasy.Hotel.Services
     public class RoomService: IRoomService
     {
         private readonly HotelDbContext _db;
-        public RoomService(HotelDbContext db)
+        private readonly Cloudinary _cloudinary;
+
+        public RoomService(HotelDbContext db, Cloudinary cloudinary)
         {
             _db = db;
+            _cloudinary = cloudinary;
         }
         public async Task<ApiResponse<RoomTypeResponseDto>> CreateRoomTypeAsync(Guid hotelId, CreateRoomTypeDto dto, Guid managerId)
         {
@@ -56,6 +61,33 @@ namespace StayEasy.Hotel.Services
 
             return ApiResponse<bool>.Ok(true, "Room type deleted.");
         }
+
+        public async Task<ApiResponse<bool>> UploadPhotoAsync(Guid roomTypeId, IFormFile photo, Guid managerId)
+        {
+            var room = await _db.RoomTypes
+                .Include(r => r.Hotel)
+                .FirstOrDefaultAsync(r => r.Id == roomTypeId && r.Hotel.ManagerId == managerId && r.IsActive);
+
+            if (room == null)
+                throw new NotFoundException("RoomType", roomTypeId);
+
+            using var stream = photo.OpenReadStream();
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(photo.FileName, stream),
+                Folder = $"stayeasy/rooms/{room.HotelId}"
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            if (uploadResult.Error != null)
+                return ApiResponse<bool>.Fail(uploadResult.Error.Message);
+
+            room.PhotoUrl = uploadResult.SecureUrl.ToString();
+            await _db.SaveChangesAsync();
+
+            return ApiResponse<bool>.Ok(true, "Room photo uploaded successfully.");
+        }
+
         private static RoomTypeResponseDto MapToDto(RoomType r) => new()
         {
             Id = r.Id,

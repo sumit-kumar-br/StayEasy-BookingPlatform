@@ -185,6 +185,33 @@ namespace StayEasy.Booking.Services
                 // Do not fail booking confirmation if notification infrastructure is temporarily unavailable.
             }
 
+            var managerContact = await TryGetManagerContactByHotelAsync(booking.HotelId);
+            if (managerContact is not null)
+            {
+                try
+                {
+                    await _publishEndpoint.Publish(new ManagerBookingRequestEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        OccurredAtUtc = DateTime.UtcNow,
+                        CorrelationId = booking.BookingRef,
+                        BookingId = booking.Id,
+                        HotelId = booking.HotelId,
+                        ManagerId = managerContact.Id,
+                        Email = managerContact.Email,
+                        HotelName = booking.HotelName,
+                        RoomTypeName = booking.RoomTypeName,
+                        GuestName = booking.GuestName,
+                        CheckInUtc = booking.CheckIn,
+                        CheckOutUtc = booking.CheckOut
+                    });
+                }
+                catch
+                {
+                    // Do not fail booking confirmation if notification infrastructure is temporarily unavailable.
+                }
+            }
+
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
         }
 
@@ -210,6 +237,53 @@ namespace StayEasy.Booking.Services
 
             booking.Status = BookingStatus.Confirmed;
             await _db.SaveChangesAsync();
+
+            try
+            {
+                await _publishEndpoint.Publish(new BookingCreatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OccurredAtUtc = DateTime.UtcNow,
+                    CorrelationId = booking.BookingRef,
+                    BookingId = booking.Id,
+                    UserId = booking.TravelerId,
+                    Email = booking.GuestEmail,
+                    HotelName = booking.HotelName,
+                    CheckInUtc = booking.CheckIn,
+                    CheckOutUtc = booking.CheckOut
+                });
+            }
+            catch
+            {
+                // Do not fail booking confirmation if notification infrastructure is temporarily unavailable.
+            }
+
+            var managerContact = await TryGetUserContactAsync(managerId);
+            if (managerContact is not null)
+            {
+                try
+                {
+                    await _publishEndpoint.Publish(new ManagerBookingConfirmedEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        OccurredAtUtc = DateTime.UtcNow,
+                        CorrelationId = booking.BookingRef,
+                        BookingId = booking.Id,
+                        HotelId = booking.HotelId,
+                        ManagerId = managerContact.Id,
+                        Email = managerContact.Email,
+                        HotelName = booking.HotelName,
+                        RoomTypeName = booking.RoomTypeName,
+                        GuestName = booking.GuestName,
+                        CheckInUtc = booking.CheckIn,
+                        CheckOutUtc = booking.CheckOut
+                    });
+                }
+                catch
+                {
+                    // Do not fail booking confirmation if notification infrastructure is temporarily unavailable.
+                }
+            }
 
             return ApiResponse<bool>.Ok(true, "Booking confirmed successfully.");
         }
@@ -251,6 +325,33 @@ namespace StayEasy.Booking.Services
             }
             catch
             {
+            }
+
+            var managerContact = await TryGetManagerContactByHotelAsync(booking.HotelId);
+            if (managerContact is not null)
+            {
+                try
+                {
+                    await _publishEndpoint.Publish(new ManagerBookingCancelledEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        OccurredAtUtc = DateTime.UtcNow,
+                        CorrelationId = booking.BookingRef,
+                        BookingId = booking.Id,
+                        HotelId = booking.HotelId,
+                        ManagerId = managerContact.Id,
+                        Email = managerContact.Email,
+                        HotelName = booking.HotelName,
+                        RoomTypeName = booking.RoomTypeName,
+                        GuestName = booking.GuestName,
+                        CheckInUtc = booking.CheckIn,
+                        CheckOutUtc = booking.CheckOut,
+                        CancelledBy = "Traveler"
+                    });
+                }
+                catch
+                {
+                }
             }
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
@@ -297,6 +398,33 @@ namespace StayEasy.Booking.Services
             }
             catch
             {
+            }
+
+            var managerContact = await TryGetUserContactAsync(managerId);
+            if (managerContact is not null)
+            {
+                try
+                {
+                    await _publishEndpoint.Publish(new ManagerBookingCancelledEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        OccurredAtUtc = DateTime.UtcNow,
+                        CorrelationId = booking.BookingRef,
+                        BookingId = booking.Id,
+                        HotelId = booking.HotelId,
+                        ManagerId = managerContact.Id,
+                        Email = managerContact.Email,
+                        HotelName = booking.HotelName,
+                        RoomTypeName = booking.RoomTypeName,
+                        GuestName = booking.GuestName,
+                        CheckInUtc = booking.CheckIn,
+                        CheckOutUtc = booking.CheckOut,
+                        CancelledBy = "Hotel Manager"
+                    });
+                }
+                catch
+                {
+                }
             }
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
@@ -418,6 +546,44 @@ namespace StayEasy.Booking.Services
 
         private async Task<bool> IsHotelOwnedByManagerAsync(Guid hotelId, Guid managerId)
         {
+            var hotelManagerId = await GetHotelManagerIdAsync(hotelId);
+            return hotelManagerId.HasValue && hotelManagerId.Value == managerId;
+        }
+
+        private async Task<ManagerContactDto?> TryGetManagerContactByHotelAsync(Guid hotelId)
+        {
+            var managerId = await GetHotelManagerIdAsync(hotelId);
+            if (!managerId.HasValue)
+                return null;
+
+            return await TryGetUserContactAsync(managerId.Value);
+        }
+
+        private async Task<ManagerContactDto?> TryGetUserContactAsync(Guid userId)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"http://localhost:7159/api/auth/internal/users/{userId}";
+
+            try
+            {
+                var response = await client.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var payload = await response.Content.ReadFromJsonAsync<ApiResponse<ManagerContactDto>>();
+                if (payload?.Data is null || string.IsNullOrWhiteSpace(payload.Data.Email))
+                    return null;
+
+                return payload.Data;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private async Task<Guid?> GetHotelManagerIdAsync(Guid hotelId)
+        {
             var client = _httpClientFactory.CreateClient();
             var url = $"http://localhost:5062/api/hotels/{hotelId}";
 
@@ -425,14 +591,14 @@ namespace StayEasy.Booking.Services
             {
                 var response = await client.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
-                    return false;
+                    return null;
 
                 var payload = await response.Content.ReadFromJsonAsync<ApiEnvelope<HotelOwnershipDto>>();
-                return payload?.Data?.ManagerId == managerId;
+                return payload?.Data?.ManagerId;
             }
             catch
             {
-                return false;
+                return null;
             }
         }
 
@@ -527,6 +693,14 @@ namespace StayEasy.Booking.Services
         private sealed class HotelOwnershipDto
         {
             public Guid ManagerId { get; set; }
+        }
+
+        private sealed class ManagerContactDto
+        {
+            public Guid Id { get; set; }
+            public string FullName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
         }
     }
 }

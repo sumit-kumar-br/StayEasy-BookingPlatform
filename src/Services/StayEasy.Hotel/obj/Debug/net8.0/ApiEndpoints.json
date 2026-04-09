@@ -92,7 +92,7 @@
         "IsRequired": true
       },
       {
-        "Name": "photo",
+        "Name": "File",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
         "IsRequired": false
       }
@@ -179,6 +179,27 @@
         "Name": "roomTypeId",
         "Type": "System.Guid",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StayEasy.Hotel.Controllers.RoomsController",
+    "Method": "UploadRoomPhoto",
+    "RelativePath": "api/Rooms/{roomTypeId}/photo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roomTypeId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

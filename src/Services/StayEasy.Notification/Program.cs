@@ -25,6 +25,9 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<BookingCreatedConsumer>();
     x.AddConsumer<BookingCancelledConsumer>();
     x.AddConsumer<PaymentSucceededConsumer>();
+    x.AddConsumer<ManagerBookingRequestConsumer>();
+    x.AddConsumer<ManagerBookingConfirmedConsumer>();
+    x.AddConsumer<ManagerBookingCancelledConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -56,6 +59,21 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("notification.payment.succeeded", e =>
         {
             e.ConfigureConsumer<PaymentSucceededConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification.manager.booking.request", e =>
+        {
+            e.ConfigureConsumer<ManagerBookingRequestConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification.manager.booking.confirmed", e =>
+        {
+            e.ConfigureConsumer<ManagerBookingConfirmedConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification.manager.booking.cancelled", e =>
+        {
+            e.ConfigureConsumer<ManagerBookingCancelledConsumer>(context);
         });
     });
 });

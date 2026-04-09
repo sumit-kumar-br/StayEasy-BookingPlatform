@@ -71,10 +71,10 @@ namespace StayEasy.Hotel.Controllers
         }
         [HttpPost("{id}/photo")]
         [Authorize(Roles = "HotelManager")]
-        public async Task<IActionResult> UploadPhoto(Guid id, IFormFile photo)
+        public async Task<IActionResult> UploadPhoto(Guid id, [FromForm] PhotoUploadRequestDto request)
         {
             var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _hotelService.UploadPhotoAsync(id, photo, managerId);
+            var result = await _hotelService.UploadPhotoAsync(id, request.File, managerId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }

@@ -178,6 +178,23 @@ namespace StayEasy.Auth.Services
             return ApiResponse<List<AdminUserDto>>.Ok(users);
         }
 
+        public async Task<ApiResponse<UserContactDto>> GetUserContactAsync(Guid userId)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return ApiResponse<UserContactDto>.Fail("User not found.");
+            }
+
+            return ApiResponse<UserContactDto>.Ok(new UserContactDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            });
+        }
+
         public async Task<ApiResponse<bool>> BanUserAsync(Guid userId)
         {
             var user = await _db.Users.FindAsync(userId);
