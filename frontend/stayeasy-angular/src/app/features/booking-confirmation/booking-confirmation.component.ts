@@ -437,7 +437,8 @@ export class BookingConfirmationComponent implements OnInit {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return checkIn >= today;
+    // Hide traveler cancel option once check-in date has arrived.
+    return checkIn > today;
   }
 
   cancelBooking(): void {

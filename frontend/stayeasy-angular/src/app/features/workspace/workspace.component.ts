@@ -555,6 +555,14 @@ export class WorkspaceComponent implements OnInit {
       summary: 'Review incoming bookings and respond quickly to traveler reservations and requests.',
       route: '/manager/bookings',
       actionLabel: 'Handle Bookings'
+    },
+    {
+      name: 'Revenue Manager',
+      icon: '💰',
+      badge: 'Collections',
+      summary: 'Monitor collected revenue, pending booking value, and hotel-wise performance.',
+      route: '/manager/revenue',
+      actionLabel: 'View Revenue'
     }
   ];
 

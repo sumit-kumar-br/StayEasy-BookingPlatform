@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { catchError, map, mergeMap, Observable, retryWhen, throwError, timer } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../models/api-response.model';
 import { Booking, ConfirmBookingRequest, CreateHoldRequest, Hold, RoomAvailability } from '../../models/booking.model';
@@ -31,6 +31,19 @@ export class BookingService {
     return this.http
       .post<ApiResponse<Booking>>(`${environment.bookingApiUrl}/bookings/confirm`, request)
       .pipe(
+        retryWhen((errors) =>
+          errors.pipe(
+            mergeMap((error, attemptIndex) => {
+              const shouldRetry = attemptIndex < 1 && this.isTransientBookingError(error);
+
+              if (!shouldRetry) {
+                return throwError(() => error);
+              }
+
+              return timer(750);
+            })
+          )
+        ),
         map((res) => res.data),
         catchError((error) => {
           if (error?.status !== 503) {
@@ -50,6 +63,12 @@ export class BookingService {
             );
         })
       );
+  }
+
+  private isTransientBookingError(error: unknown): boolean {
+    const httpError = error as { status?: number; name?: string } | undefined;
+
+    return httpError?.status === 0 || httpError?.status === 503 || httpError?.name === 'TimeoutError';
   }
 
   cancelBooking(id: string): Observable<unknown> {

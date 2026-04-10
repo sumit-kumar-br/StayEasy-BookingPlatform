@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { BookingService } from '../../../core/services/booking.service';
 import { HotelService } from '../../../core/services/hotel.service';
+import { Booking } from '../../../models/booking.model';
 import { Hotel } from '../../../models/hotel.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
@@ -25,6 +27,9 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
             <button mat-raised-button routerLink="/manager/hotels">
               <span class="icon">🏨</span> View All Hotels
             </button>
+            <button mat-raised-button routerLink="/manager/revenue">
+              <span class="icon">💰</span> Revenue Collection
+            </button>
           </div>
         </div>
       </div>
@@ -44,6 +49,11 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
           <div class="stat-icon">✅</div>
           <p class="label">Approved</p>
           <p class="stat">{{ approvedHotels }}</p>
+        </mat-card>
+        <mat-card class="stat-card">
+          <div class="stat-icon">💰</div>
+          <p class="label">Collected Revenue</p>
+          <p class="stat revenue">{{ collectedRevenue | currency: 'INR':'symbol':'1.0-0' }}</p>
         </mat-card>
       </div>
 
@@ -206,6 +216,10 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
         line-height: 1;
       }
 
+      .stat.revenue {
+        font-size: 2.2rem;
+      }
+
       .recent-section {
         padding: 32px;
         border-radius: 12px;
@@ -354,8 +368,10 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 })
 export class ManagerDashboardComponent implements OnInit {
   private readonly hotelService = inject(HotelService);
+  private readonly bookingService = inject(BookingService);
 
   hotels: Hotel[] = [];
+  bookings: Booking[] = [];
 
   get pendingHotels(): number {
     return this.hotels.filter((h) => String(h.status).toLowerCase() === 'pendingreview').length;
@@ -365,9 +381,21 @@ export class ManagerDashboardComponent implements OnInit {
     return this.hotels.filter((h) => String(h.status).toLowerCase() === 'approved').length;
   }
 
+  get collectedRevenue(): number {
+    const managerHotelIds = new Set(this.hotels.map((hotel) => hotel.id));
+
+    return this.bookings
+      .filter((b) => managerHotelIds.has(b.hotelId) && String(b.status).toLowerCase() === 'confirmed')
+      .reduce((sum, booking) => sum + booking.totalAmount, 0);
+  }
+
   ngOnInit(): void {
     this.hotelService.getMyHotels().subscribe((hotels) => {
       this.hotels = hotels;
+    });
+
+    this.bookingService.getIncomingBookings().subscribe((bookings) => {
+      this.bookings = bookings;
     });
   }
 }

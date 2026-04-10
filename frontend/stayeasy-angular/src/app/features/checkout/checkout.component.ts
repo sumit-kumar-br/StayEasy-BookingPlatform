@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { interval, Subscription, timeout } from 'rxjs';
 import { BookingService } from '../../core/services/booking.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -25,6 +26,7 @@ import { Hold } from '../../models/booking.model';
     MatInputModule,
     MatButtonModule,
     MatIconModule
+    ,MatProgressSpinnerModule
   ],
   template: `
     <section class="checkout-container" *ngIf="hold">
@@ -114,9 +116,9 @@ import { Hold } from '../../models/booking.model';
 
           <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isProcessingPayment" class="submit-btn">
             <span *ngIf="!isProcessingPayment">Pay {{ hold.totalAmount | currency: 'INR':'symbol':'1.0-0' }}</span>
-            <span *ngIf="isProcessingPayment">
-              <mat-icon>schedule</mat-icon>
-              Processing...
+            <span *ngIf="isProcessingPayment" class="processing-label">
+              <mat-spinner diameter="18"></mat-spinner>
+              <span>Processing...</span>
             </span>
           </button>
 
@@ -322,8 +324,15 @@ import { Hold } from '../../models/booking.model';
           opacity: 0.6;
         }
 
-        mat-icon {
-          margin-right: 8px;
+        .processing-label {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        mat-spinner {
+          display: inline-block;
         }
       }
 
@@ -494,40 +503,37 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.notification.error('Booking request timed out. Please click the button again.');
     }, 12000);
 
-    // Mock payment success and directly confirm booking.
-    setTimeout(() => {
-      this.confirmSub = this.bookingService
-        .confirmBooking({
-          holdId: this.hold!.holdId,
-          guestName: this.form.value.guestName ?? '',
-          guestEmail: this.form.value.guestEmail ?? '',
-          specialRequests: this.form.value.specialRequests ?? ''
-        })
-        .pipe(timeout(10000))
-        .subscribe({
-          next: (booking) => {
-            this.isProcessingPayment = false;
-            if (this.processingWatchdog) {
-              clearTimeout(this.processingWatchdog);
-            }
-            this.notification.success('Payment successful. Booking confirmed.');
-            this.router.navigate(['/booking-confirmation', booking.id]);
-          },
-          error: (error: HttpErrorResponse) => {
-            this.isProcessingPayment = false;
-            if (this.processingWatchdog) {
-              clearTimeout(this.processingWatchdog);
-            }
-
-            const reason = this.readApiErrorMessage(error);
-            this.notification.error(reason);
-
-            if (reason.includes('Hold has expired') || reason.includes('Hold not found or already released')) {
-              this.router.navigate(['/hotels/search']);
-            }
+    this.confirmSub = this.bookingService
+      .confirmBooking({
+        holdId: this.hold!.holdId,
+        guestName: this.form.value.guestName ?? '',
+        guestEmail: this.form.value.guestEmail ?? '',
+        specialRequests: this.form.value.specialRequests ?? ''
+      })
+      .pipe(timeout(20000))
+      .subscribe({
+        next: (booking) => {
+          this.isProcessingPayment = false;
+          if (this.processingWatchdog) {
+            clearTimeout(this.processingWatchdog);
           }
-        });
-    }, 700);
+          this.notification.success('Payment successful. Booking confirmed.');
+          this.router.navigate(['/booking-confirmation', booking.id]);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.isProcessingPayment = false;
+          if (this.processingWatchdog) {
+            clearTimeout(this.processingWatchdog);
+          }
+
+          const reason = this.readApiErrorMessage(error);
+          this.notification.error(reason);
+
+          if (reason.includes('Hold has expired') || reason.includes('Hold not found or already released')) {
+            this.router.navigate(['/hotels/search']);
+          }
+        }
+      });
   }
 
   private readApiErrorMessage(error: HttpErrorResponse): string {

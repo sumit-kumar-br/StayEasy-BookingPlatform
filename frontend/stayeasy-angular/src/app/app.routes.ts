@@ -113,6 +113,15 @@ export const routes: Routes = [
 			)
 	},
 	{
+		path: 'manager/revenue',
+		canActivate: [authGuard, roleGuard],
+		data: { roles: [UserRole.HotelManager] },
+		loadComponent: () =>
+			import('./features/manager/revenue-collection/revenue-collection.component').then(
+				(m) => m.RevenueCollectionComponent
+			)
+	},
+	{
 		path: 'admin/dashboard',
 		canActivate: [authGuard, roleGuard],
 		data: { roles: [UserRole.Admin] },
