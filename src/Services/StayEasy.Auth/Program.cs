@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Auth service.
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -23,6 +24,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Messaging pipeline for cross-service events (registration notifications, etc.).
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((_, cfg) =>
@@ -86,6 +88,7 @@ app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

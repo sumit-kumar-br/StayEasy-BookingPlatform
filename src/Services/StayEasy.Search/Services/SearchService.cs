@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StayEasy.Search.Data;
 using StayEasy.Search.DTOs;
 using StayEasy.Shared.Common;
@@ -6,6 +6,9 @@ using StayEasy.Shared.Exceptions;
 
 namespace StayEasy.Search.Services
 {
+    /// <summary>
+    /// Implements hotel discovery and detail projection for traveler search flows.
+    /// </summary>
     public class SearchService: ISearchService
     {
         private readonly SearchDbContext _db;
@@ -14,6 +17,9 @@ namespace StayEasy.Search.Services
             _db = db;
         }
 
+        /// <summary>
+        /// Searches approved hotels using city, rating, price, and occupancy filters.
+        /// </summary>
         public async Task<ApiResponse<List<HotelSearchResultDto>>> SearchHotelsAsync(HotelSearchRequestDto request)
         {
             var query = _db.Hotels.Include(h => h.RoomTypes.Where(r => r.IsActive)).Where(h => h.Status == "Approved");
@@ -56,6 +62,10 @@ namespace StayEasy.Search.Services
 
             return ApiResponse<List<HotelSearchResultDto>>.Ok(results);
         }
+
+        /// <summary>
+        /// Returns detail data for one hotel in search context.
+        /// </summary>
         public async Task<ApiResponse<HotelSearchResultDto>> GetHotelDetailAsync(Guid hotelId)
         {
             var hotel = await _db.Hotels.Include(h => h.RoomTypes.Where(r => r.IsActive))

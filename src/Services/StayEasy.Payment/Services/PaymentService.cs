@@ -15,6 +15,9 @@ using StayEasy.Shared.Contracts.Notifications;
 
 namespace StayEasy.Payment.Services
 {
+    /// <summary>
+    /// Integrates payment-provider order creation and payment verification for bookings.
+    /// </summary>
     public class PaymentService : IPaymentService
     {
         private readonly PaymentDbContext _db;
@@ -37,6 +40,9 @@ namespace StayEasy.Payment.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Creates a payment order with the configured provider and stores a pending transaction.
+        /// </summary>
         public async Task<ApiResponse<CreateOrderResponseDto>> CreateOrderAsync(CreateOrderRequestDto dto, Guid userId)
         {
             if (dto.Amount <= 0)
@@ -104,6 +110,9 @@ namespace StayEasy.Payment.Services
             });
         }
 
+        /// <summary>
+        /// Verifies provider signature, updates transaction status, and publishes success events.
+        /// </summary>
         public async Task<ApiResponse<bool>> VerifyPaymentAsync(VerifyPaymentRequestDto dto, Guid userId)
         {
             var txn = await _db.PaymentTransactions
@@ -147,6 +156,9 @@ namespace StayEasy.Payment.Services
             return ApiResponse<bool>.Ok(true, "Payment verified successfully.");
         }
 
+        /// <summary>
+        /// Returns the stored payment status for a booking.
+        /// </summary>
         public async Task<ApiResponse<PaymentStatusResponseDto>> GetPaymentStatusAsync(Guid bookingId, Guid userId)
         {
             var txn = await _db.PaymentTransactions

@@ -7,6 +7,7 @@ using StayEasy.Notification.Options;
 using StayEasy.Notification.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Notification service.
 
 builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<NotificationDbContext>(options =>
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddScoped<INotificationLogService, NotificationLogService>();
 
+// Messaging pipeline that maps domain events to notification consumers.
 builder.Services.AddMassTransit(x =>
 {
     x.SetKebabCaseEndpointNameFormatter();
@@ -86,6 +88,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    // Apply pending migrations for notification logs at startup.
     var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
     db.Database.Migrate();
 }
@@ -98,6 +101,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

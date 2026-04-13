@@ -5,6 +5,9 @@ using StayEasy.Shared.Contracts.Notifications;
 
 namespace StayEasy.Notification.Consumers
 {
+    /// <summary>
+    /// Consumes integration events in UserRegisteredConsumer.
+    /// </summary>
     public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
     {
         private readonly INotificationLogService _notificationService;
@@ -14,6 +17,9 @@ namespace StayEasy.Notification.Consumers
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Executes Consume business operation.
+        /// </summary>
         public async Task Consume(ConsumeContext<UserRegisteredEvent> context)
         {
             var msg = context.Message;

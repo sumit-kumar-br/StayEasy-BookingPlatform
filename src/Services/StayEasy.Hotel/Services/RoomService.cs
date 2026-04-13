@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using StayEasy.Hotel.Data;
@@ -9,6 +9,9 @@ using StayEasy.Shared.Exceptions;
 
 namespace StayEasy.Hotel.Services
 {
+    /// <summary>
+    /// Implements room-type creation, listing, soft-delete, and media upload operations.
+    /// </summary>
     public class RoomService: IRoomService
     {
         private readonly HotelDbContext _db;
@@ -19,6 +22,10 @@ namespace StayEasy.Hotel.Services
             _db = db;
             _cloudinary = cloudinary;
         }
+
+        /// <summary>
+        /// Creates a room type under a manager-owned hotel.
+        /// </summary>
         public async Task<ApiResponse<RoomTypeResponseDto>> CreateRoomTypeAsync(Guid hotelId, CreateRoomTypeDto dto, Guid managerId)
         {
             var hotel = await _db.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId && h.ManagerId == managerId);
@@ -42,12 +49,20 @@ namespace StayEasy.Hotel.Services
 
             return ApiResponse<RoomTypeResponseDto>.Ok(MapToDto(roomType));
         }
+
+        /// <summary>
+        /// Lists active room types for a hotel.
+        /// </summary>
         public async Task<ApiResponse<List<RoomTypeResponseDto>>> GetRoomTypesAsync(Guid hotelId)
         {
             var rooms = await _db.RoomTypes.Where(r => r.HotelId == hotelId && r.IsActive).ToListAsync();
 
             return ApiResponse<List<RoomTypeResponseDto>>.Ok(rooms.Select(MapToDto).ToList());
         }
+
+        /// <summary>
+        /// Soft-deletes a room type by marking it inactive.
+        /// </summary>
         public async Task<ApiResponse<bool>> DeleteRoomTypeAsync(Guid roomTypeId, Guid managerId)
         {
             var room = await _db.RoomTypes.Include(r => r.Hotel)
@@ -62,6 +77,9 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<bool>.Ok(true, "Room type deleted.");
         }
 
+        /// <summary>
+        /// Uploads a room image to Cloudinary and persists the URL.
+        /// </summary>
         public async Task<ApiResponse<bool>> UploadPhotoAsync(Guid roomTypeId, IFormFile photo, Guid managerId)
         {
             var room = await _db.RoomTypes

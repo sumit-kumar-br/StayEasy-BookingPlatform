@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Hotel.Models
+namespace StayEasy.Hotel.Models
 {
+    /// <summary>
+    /// Represents domain data for RoomType.
+    /// </summary>
     public class RoomType
     {
         public Guid Id { get; set; } = Guid.NewGuid();

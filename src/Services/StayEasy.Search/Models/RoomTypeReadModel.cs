@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Search.Models
+namespace StayEasy.Search.Models
 {
+    /// <summary>
+    /// Represents domain data for RoomTypeReadModel.
+    /// </summary>
     public class RoomTypeReadModel
     {
         public Guid Id { get; set; }

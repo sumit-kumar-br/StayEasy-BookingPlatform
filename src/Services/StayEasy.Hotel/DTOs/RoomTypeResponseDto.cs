@@ -1,7 +1,10 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace StayEasy.Hotel.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for RoomTypeResponseDto.
+    /// </summary>
     public class RoomTypeResponseDto
     {
         public Guid Id { get; set; }

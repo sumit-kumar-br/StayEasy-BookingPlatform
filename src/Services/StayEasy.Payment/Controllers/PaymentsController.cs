@@ -9,6 +9,9 @@ namespace StayEasy.Payment.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    /// <summary>
+    /// Handles HTTP endpoints for PaymentsController.
+    /// </summary>
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
@@ -19,6 +22,9 @@ namespace StayEasy.Payment.Controllers
         }
 
         [HttpPost("create-order")]
+        /// <summary>
+        /// Creates resources for CreateOrder.
+        /// </summary>
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequestDto dto)
         {
             if (!TryGetUserId(out var userId))
@@ -31,6 +37,9 @@ namespace StayEasy.Payment.Controllers
         }
 
         [HttpPost("verify")]
+        /// <summary>
+        /// Updates state via Verify.
+        /// </summary>
         public async Task<IActionResult> Verify([FromBody] VerifyPaymentRequestDto dto)
         {
             if (!TryGetUserId(out var userId))
@@ -43,6 +52,9 @@ namespace StayEasy.Payment.Controllers
         }
 
         [HttpGet("{bookingId:guid}")]
+        /// <summary>
+        /// Retrieves data for GetStatus.
+        /// </summary>
         public async Task<IActionResult> GetStatus(Guid bookingId)
         {
             if (!TryGetUserId(out var userId))

@@ -9,6 +9,9 @@ using StayEasy.Shared.JWT;
 
 namespace StayEasy.Auth.Services
 {
+    /// <summary>
+    /// Implements authentication, token lifecycle, and admin user-management operations.
+    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly AuthDbContext _db;
@@ -26,6 +29,10 @@ namespace StayEasy.Auth.Services
             _jwtSettings = jwtSettings;
             _publishEndpoint = publishEndpoint;
         }
+
+        /// <summary>
+        /// Registers a new account and publishes a user-registration event.
+        /// </summary>
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterDto dto)
         {
             // Check if email already exists
@@ -65,7 +72,9 @@ namespace StayEasy.Auth.Services
             }, "Registration successful. Please Verify your email.");
         }
 
-
+        /// <summary>
+        /// Authenticates a user and issues access plus refresh tokens.
+        /// </summary>
         public async Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginDto dto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email.ToLower());
@@ -99,6 +108,9 @@ namespace StayEasy.Auth.Services
             });
         }
 
+        /// <summary>
+        /// Rotates tokens using a valid refresh token.
+        /// </summary>
         public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string refreshToken)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken 
@@ -125,6 +137,9 @@ namespace StayEasy.Auth.Services
             });
         }
 
+        /// <summary>
+        /// Verifies a user account via email token.
+        /// </summary>
         public async Task<ApiResponse<bool>> VerifyEmailAsync(string token)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.VerificationToken == token && 
@@ -141,6 +156,9 @@ namespace StayEasy.Auth.Services
             return ApiResponse<bool>.Ok(true, "Email verified successfully.");
         }
 
+        /// <summary>
+        /// Revokes a refresh token and ends the session.
+        /// </summary>
         public async Task<ApiResponse<bool>> LogoutAsync(string refreshToken)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
@@ -158,6 +176,9 @@ namespace StayEasy.Auth.Services
             return ApiResponse<bool>.Ok(true, "logged out successfully.");
         }
 
+        /// <summary>
+        /// Returns users for admin dashboards.
+        /// </summary>
         public async Task<ApiResponse<List<AdminUserDto>>> GetUsersAsync()
         {
             var users = await _db.Users
@@ -178,6 +199,9 @@ namespace StayEasy.Auth.Services
             return ApiResponse<List<AdminUserDto>>.Ok(users);
         }
 
+        /// <summary>
+        /// Fetches contact details for a specific user.
+        /// </summary>
         public async Task<ApiResponse<UserContactDto>> GetUserContactAsync(Guid userId)
         {
             var user = await _db.Users.FindAsync(userId);
@@ -195,6 +219,9 @@ namespace StayEasy.Auth.Services
             });
         }
 
+        /// <summary>
+        /// Bans a user account.
+        /// </summary>
         public async Task<ApiResponse<bool>> BanUserAsync(Guid userId)
         {
             var user = await _db.Users.FindAsync(userId);
@@ -208,6 +235,9 @@ namespace StayEasy.Auth.Services
             return ApiResponse<bool>.Ok(true, "User has been banned.");
         }
 
+        /// <summary>
+        /// Restores access to a banned user account.
+        /// </summary>
         public async Task<ApiResponse<bool>> UnbanUserAsync(Guid userId)
         {
             var user = await _db.Users.FindAsync(userId);
@@ -221,6 +251,9 @@ namespace StayEasy.Auth.Services
             return ApiResponse<bool>.Ok(true, "User has been unbanned.");
         }
 
+        /// <summary>
+        /// Allows admins to mark an account as verified.
+        /// </summary>
         public async Task<ApiResponse<bool>> VerifyUserAsAdminAsync(Guid userId)
         {
             var user = await _db.Users.FindAsync(userId);

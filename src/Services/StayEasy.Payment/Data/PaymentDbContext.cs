@@ -3,6 +3,9 @@ using StayEasy.Payment.Models;
 
 namespace StayEasy.Payment.Data
 {
+    /// <summary>
+    /// Defines persistence configuration for PaymentDbContext.
+    /// </summary>
     public class PaymentDbContext : DbContext
     {
         public PaymentDbContext(DbContextOptions<PaymentDbContext> options) : base(options)

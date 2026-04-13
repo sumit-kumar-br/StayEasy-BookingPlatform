@@ -1,5 +1,8 @@
 namespace StayEasy.Notification.Options
 {
+    /// <summary>
+    /// Represents configuration options for SmtpOptions.
+    /// </summary>
     public class SmtpOptions
     {
         public string Host { get; set; } = string.Empty;

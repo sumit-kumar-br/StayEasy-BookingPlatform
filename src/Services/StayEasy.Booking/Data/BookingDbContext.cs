@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StayEasy.Booking.Models;
 using BookingModel = StayEasy.Booking.Models.Booking;
 
 namespace StayEasy.Booking.Data
 {
+    /// <summary>
+    /// Defines persistence configuration for BookingDbContext.
+    /// </summary>
     public class BookingDbContext: DbContext
     {
         public BookingDbContext(DbContextOptions<BookingDbContext> options): base(options) { }

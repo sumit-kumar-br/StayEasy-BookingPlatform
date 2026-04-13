@@ -1,4 +1,4 @@
-﻿using StayEasy.Shared.Enums;
+using StayEasy.Shared.Enums;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,13 +7,24 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace StayEasy.Shared.JWT
 {
+    /// <summary>
+    /// Generates JWT access tokens from configured issuer and signing settings.
+    /// </summary>
     public class JwtTokenGenerator
     {
         private readonly JwtSettings _settings;
+
+        /// <summary>
+        /// Creates a token generator for the provided JWT settings.
+        /// </summary>
         public JwtTokenGenerator(JwtSettings settings)
         {
             _settings = settings;
         }
+
+        /// <summary>
+        /// Generates a signed JWT for the specified user and role.
+        /// </summary>
         public string GenerateToken(Guid userId, string email, UserRole role)
         {
             var claims = new[]

@@ -6,6 +6,9 @@ namespace StayEasy.Notification.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Handles HTTP endpoints for NotificationsController.
+    /// </summary>
     public class NotificationsController : ControllerBase
     {
         private readonly NotificationDbContext _db;
@@ -16,12 +19,18 @@ namespace StayEasy.Notification.Controllers
         }
 
         [HttpGet("health")]
+        /// <summary>
+        /// Executes Health business operation.
+        /// </summary>
         public IActionResult Health()
         {
             return Ok(new { ok = true, service = "notification" });
         }
 
         [HttpGet("logs")]
+        /// <summary>
+        /// Executes Logs business operation.
+        /// </summary>
         public async Task<IActionResult> Logs([FromQuery] int take = 50)
         {
             take = Math.Clamp(take, 1, 200);

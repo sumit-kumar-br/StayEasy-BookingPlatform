@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using System.Net.Http.Json;
 using StayEasy.Booking.DTOs;
@@ -12,6 +12,9 @@ using BookingModel = StayEasy.Booking.Models.Booking;
 
 namespace StayEasy.Booking.Services
 {
+    /// <summary>
+    /// Implements hold, booking, cancellation, and availability workflows for reservations.
+    /// </summary>
     public class BookingService: IBookingService
     {
         private readonly BookingDbContext _db;
@@ -23,9 +26,18 @@ namespace StayEasy.Booking.Services
             _publishEndpoint = publishEndpoint;
             _httpClientFactory = httpClientFactory;
         }
+
+        /// <summary>
+        /// Creates a short-lived hold after validating inventory for requested dates.
+        /// </summary>
         public async Task<ApiResponse<HoldResponseDto>> CreateHoldAsync(CreateHoldDto dto, Guid travelerId)
         {
             await ReleaseExpiredHoldsAsync();
+
+            var today = DateTime.Now.Date;
+
+            if (dto.CheckIn.Date < today)
+                return ApiResponse<HoldResponseDto>.Fail("Check-in date has already passed. Please select today or a future date.");
 
             if (dto.CheckOut <= dto.CheckIn)
                 return ApiResponse<HoldResponseDto>.Fail("Check-out must be after check-in.");
@@ -61,6 +73,10 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<HoldResponseDto>.Ok(MapHoldToDto(hold));
         }
+
+        /// <summary>
+        /// Retrieves an active hold and returns expiry-aware details.
+        /// </summary>
         public async Task<ApiResponse<HoldResponseDto>> GetHoldAsync(Guid holdId)
         {
             await ReleaseExpiredHoldsAsync();
@@ -79,6 +95,10 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<HoldResponseDto>.Ok(MapHoldToDto(hold));
         }
+
+        /// <summary>
+        /// Releases an existing hold record.
+        /// </summary>
         public async Task<ApiResponse<bool>> ReleaseHoldAsync(Guid holdId)
         {
             var hold = await _db.HoldRecords.FindAsync(holdId);
@@ -91,9 +111,15 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<bool>.Ok(true, "Hold released");
         }
+
+        /// <summary>
+        /// Confirms a booking from a valid hold and publishes booking events.
+        /// </summary>
         public async Task<ApiResponse<BookingResponseDto>> ConfirmBookingAsync(CreateBookingDto dto, Guid travelerId)
         {
             await ReleaseExpiredHoldsAsync();
+
+            var today = DateTime.Now.Date;
 
             var hold = await _db.HoldRecords.FindAsync(dto.HoldId);
 
@@ -123,6 +149,13 @@ namespace StayEasy.Booking.Services
                 hold.IsReleased = true;
                 await _db.SaveChangesAsync();
                 return ApiResponse<BookingResponseDto>.Fail("Hold has expired. Please select your room again.");
+            }
+
+            if (hold.CheckIn.Date < today)
+            {
+                hold.IsReleased = true;
+                await _db.SaveChangesAsync();
+                return ApiResponse<BookingResponseDto>.Fail("Check-in date has already passed. Please select today or a future date.");
             }
 
             if (hold.TravelerId != travelerId)
@@ -215,6 +248,9 @@ namespace StayEasy.Booking.Services
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
         }
 
+        /// <summary>
+        /// Confirms a booking through the manager workflow for owned properties.
+        /// </summary>
         public async Task<ApiResponse<bool>> ConfirmBookingAsManagerAsync(Guid bookingId, Guid managerId)
         {
             var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
@@ -287,6 +323,10 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<bool>.Ok(true, "Booking confirmed successfully.");
         }
+
+        /// <summary>
+        /// Cancels a traveler booking when cancellation policies allow it.
+        /// </summary>
         public async Task<ApiResponse<bool>> CancelBookingAsync(Guid bookingId, Guid travelerId)
         {
             var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId 
@@ -360,6 +400,9 @@ namespace StayEasy.Booking.Services
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
         }
 
+        /// <summary>
+        /// Cancels a booking as manager for hotels the manager owns.
+        /// </summary>
         public async Task<ApiResponse<bool>> CancelBookingAsManagerAsync(Guid bookingId, Guid managerId)
         {
             var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
@@ -432,6 +475,10 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<bool>.Ok(true, "Booking cancelled successfully.");
         }
+
+        /// <summary>
+        /// Lists bookings belonging to a traveler.
+        /// </summary>
         public async Task<ApiResponse<List<BookingResponseDto>>> GetMyBookingsAsync(Guid travelerId)
         {
             await ReleaseExpiredHoldsAsync();
@@ -452,6 +499,10 @@ namespace StayEasy.Booking.Services
 
             return ApiResponse<List<BookingResponseDto>>.Ok(bookings.Select(MapBookingToDto).ToList());
         }
+
+        /// <summary>
+        /// Returns one booking for a traveler-owned booking id.
+        /// </summary>
         public async Task<ApiResponse<BookingResponseDto>> GetBookingByIdAsync(Guid bookingId, Guid travelerId)
         {
             var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId && b.TravelerId == travelerId);
@@ -462,6 +513,9 @@ namespace StayEasy.Booking.Services
             return ApiResponse<BookingResponseDto>.Ok(MapBookingToDto(booking));
         }
 
+        /// <summary>
+        /// Returns manager-facing incoming bookings.
+        /// </summary>
         public async Task<ApiResponse<List<BookingResponseDto>>> GetIncomingBookingsAsync()
         {
             await ReleaseExpiredHoldsAsync();
@@ -484,9 +538,17 @@ namespace StayEasy.Booking.Services
             return ApiResponse<List<BookingResponseDto>>.Ok(bookings.Select(MapBookingToDto).ToList());
         }
 
+        /// <summary>
+        /// Computes room availability for the selected hotel and date range.
+        /// </summary>
         public async Task<ApiResponse<List<RoomAvailabilityDto>>> GetRoomAvailabilityAsync(Guid hotelId, DateTime checkIn, DateTime checkOut)
         {
             await ReleaseExpiredHoldsAsync();
+
+            var today = DateTime.Now.Date;
+
+            if (checkIn.Date < today)
+                return ApiResponse<List<RoomAvailabilityDto>>.Fail("Check-in date has already passed. Please select today or a future date.");
 
             if (checkOut <= checkIn)
                 return ApiResponse<List<RoomAvailabilityDto>>.Fail("Check-out must be after check-in.");
@@ -658,14 +720,16 @@ namespace StayEasy.Booking.Services
 
         private async Task<int> GetReservedUnitsAsync(Guid roomTypeId, DateTime checkIn, DateTime checkOut, Guid? excludeHoldId = null)
         {
+            var requestedCheckInDate = checkIn.Date;
+            var requestedCheckOutDate = checkOut.Date;
             var now = DateTime.UtcNow;
 
             var activeHoldQuery = _db.HoldRecords.Where(h =>
                 h.RoomTypeId == roomTypeId &&
                 !h.IsReleased &&
                 h.ExpiresAt > now &&
-                h.CheckIn < checkOut &&
-                h.CheckOut > checkIn);
+                h.CheckIn.Date < requestedCheckOutDate &&
+                h.CheckOut.Date > requestedCheckInDate);
 
             if (excludeHoldId.HasValue)
                 activeHoldQuery = activeHoldQuery.Where(h => h.Id != excludeHoldId.Value);
@@ -678,9 +742,8 @@ namespace StayEasy.Booking.Services
                     b.Status != BookingStatus.Cancelled &&
                     b.Status != BookingStatus.CheckedOut &&
                     b.Status != BookingStatus.NoShow &&
-                    b.CheckOut > now &&
-                    b.CheckIn < checkOut &&
-                    b.CheckOut > checkIn)
+                    b.CheckIn.Date < requestedCheckOutDate &&
+                    b.CheckOut.Date > requestedCheckInDate)
                 .SumAsync(b => b.Guests > 0 ? b.Guests : 1);
 
             return heldUnits + bookedUnits;

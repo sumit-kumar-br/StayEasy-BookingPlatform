@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Search.DTOs
+namespace StayEasy.Search.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for HotelSearchResultDto.
+    /// </summary>
     public class HotelSearchResultDto
     {
         public Guid Id { get; set; }

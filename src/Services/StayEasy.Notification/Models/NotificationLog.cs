@@ -1,5 +1,8 @@
 namespace StayEasy.Notification.Models
 {
+    /// <summary>
+    /// Represents domain data for NotificationLog.
+    /// </summary>
     public class NotificationLog
     {
         public Guid Id { get; set; } = Guid.NewGuid();

@@ -5,6 +5,9 @@ using StayEasy.Notification.Models;
 
 namespace StayEasy.Notification.Services
 {
+    /// <summary>
+    /// Handles idempotent notification logging and email dispatch status tracking.
+    /// </summary>
     public class NotificationLogService : INotificationLogService
     {
         private readonly NotificationDbContext _db;
@@ -21,6 +24,9 @@ namespace StayEasy.Notification.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Sends an email notification and persists delivery status for auditing and retries.
+        /// </summary>
         public async Task HandleEmailAsync(
             Guid eventId,
             string eventType,
@@ -36,6 +42,7 @@ namespace StayEasy.Notification.Services
 
             if (existing != null)
             {
+                // Protect against duplicate event delivery on the message bus.
                 _logger.LogInformation("Skipping duplicate event {EventId} for email channel", eventId);
                 return;
             }

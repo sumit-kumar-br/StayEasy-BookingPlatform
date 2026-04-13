@@ -1,5 +1,8 @@
 namespace StayEasy.Shared.Contracts.Notifications
 {
+    /// <summary>
+    /// Defines ManagerBookingRequestEvent.
+    /// </summary>
     public class ManagerBookingRequestEvent
     {
         public Guid EventId { get; set; } = Guid.NewGuid();

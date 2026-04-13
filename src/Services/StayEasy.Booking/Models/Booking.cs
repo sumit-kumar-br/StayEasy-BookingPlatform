@@ -1,7 +1,10 @@
-﻿using StayEasy.Shared.Enums;
+using StayEasy.Shared.Enums;
 
 namespace StayEasy.Booking.Models
 {
+    /// <summary>
+    /// Represents domain data for Booking.
+    /// </summary>
     public class Booking
     {
         public Guid Id { get; set; } = Guid.NewGuid();

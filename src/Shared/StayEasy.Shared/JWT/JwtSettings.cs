@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Shared.JWT
+namespace StayEasy.Shared.JWT
 {
+    /// <summary>
+    /// Defines JwtSettings.
+    /// </summary>
     public class JwtSettings
     {
         public string Key { get; set; } = string.Empty;

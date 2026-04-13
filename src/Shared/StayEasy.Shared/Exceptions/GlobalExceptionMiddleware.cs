@@ -1,10 +1,13 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using StayEasy.Shared.Common;
 
 namespace StayEasy.Shared.Exceptions
 {
+    /// <summary>
+    /// Defines GlobalExceptionMiddleware.
+    /// </summary>
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
@@ -13,6 +16,9 @@ namespace StayEasy.Shared.Exceptions
         {
             _next = next;
         }
+        /// <summary>
+        /// Executes InvokeAsync operation.
+        /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
             try

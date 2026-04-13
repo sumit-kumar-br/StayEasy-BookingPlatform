@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Shared.Enums
+namespace StayEasy.Shared.Enums
 {
+    /// <summary>
+    /// Defines UserRole.
+    /// </summary>
     public enum UserRole
     {
         Traveller,

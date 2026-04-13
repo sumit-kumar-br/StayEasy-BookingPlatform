@@ -4,6 +4,9 @@ using HotelModel = StayEasy.Hotel.Models.Hotel;
 
 namespace StayEasy.Hotel.Data
 {
+    /// <summary>
+    /// Defines persistence configuration for HotelDbContext.
+    /// </summary>
     public class HotelDbContext: DbContext
     {
         public HotelDbContext(DbContextOptions<HotelDbContext> options): base(options) { }

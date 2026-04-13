@@ -6,6 +6,7 @@ using StayEasy.Shared.JWT;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Search service.
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -17,7 +18,7 @@ builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddDbContext<SearchDbContext>(options => 
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Servcies
+// Services
 builder.Services.AddScoped<ISearchService, SearchService>();
 
 builder.Services.AddCors(options =>
@@ -82,6 +83,7 @@ app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

@@ -7,6 +7,7 @@ using StayEasy.Shared.JWT;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Hotel service.
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -14,7 +15,7 @@ const string FrontendCorsPolicy = "FrontendCorsPolicy";
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 builder.Services.AddSingleton(jwtSettings);
 
-// Cloudinary
+// Cloudinary client used by hotel and room photo upload flows.
 var cloudinarySettings = builder.Configuration.GetSection("Cloudinary");
 var cloudinary = new Cloudinary(new Account(
     cloudinarySettings["CloudName"],
@@ -94,6 +95,7 @@ app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

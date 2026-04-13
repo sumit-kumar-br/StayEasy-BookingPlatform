@@ -7,6 +7,7 @@ using StayEasy.Shared.JWT;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Booking service.
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddHttpClient();
 
+// Messaging pipeline for booking lifecycle events.
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((_, cfg) =>
@@ -104,6 +106,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

@@ -6,6 +6,9 @@ using StayEasy.Notification.Options;
 
 namespace StayEasy.Notification.Services
 {
+    /// <summary>
+    /// SMTP-backed implementation of <see cref="IEmailSender"/>.
+    /// </summary>
     public class SmtpEmailSender : IEmailSender
     {
         private readonly SmtpOptions _smtp;
@@ -15,6 +18,9 @@ namespace StayEasy.Notification.Services
             _smtp = smtpOptions.Value;
         }
 
+        /// <summary>
+        /// Sends an HTML email through configured SMTP credentials.
+        /// </summary>
         public async Task SendAsync(string toEmail, string subject, string body, CancellationToken cancellationToken = default)
         {
             using var client = new SmtpClient(_smtp.Host, _smtp.Port)

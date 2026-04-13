@@ -77,14 +77,14 @@ import { StarRatingComponent } from '../../shared/components/star-rating/star-ra
             <form class="booking-form" [formGroup]="bookingForm">
               <mat-form-field appearance="outline">
                 <mat-label>Check-in</mat-label>
-                <input matInput [matDatepicker]="checkInPicker" formControlName="checkIn" />
+                <input matInput [matDatepicker]="checkInPicker" [min]="minCheckInDate" formControlName="checkIn" />
                 <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
                 <mat-datepicker #checkInPicker></mat-datepicker>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Check-out</mat-label>
-                <input matInput [matDatepicker]="checkOutPicker" formControlName="checkOut" />
+                <input matInput [matDatepicker]="checkOutPicker" [min]="minCheckOutDate" formControlName="checkOut" />
                 <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
                 <mat-datepicker #checkOutPicker></mat-datepicker>
               </mat-form-field>
@@ -608,6 +608,17 @@ export class HotelDetailComponent implements OnInit {
     return this.bookingForm.controls.guests.value ?? 1;
   }
 
+  get minCheckInDate(): Date {
+    return this.createDefaultCheckIn();
+  }
+
+  get minCheckOutDate(): Date {
+    const minCheckOut = new Date(this.selectedCheckIn);
+    minCheckOut.setHours(0, 0, 0, 0);
+    minCheckOut.setDate(minCheckOut.getDate() + 1);
+    return minCheckOut;
+  }
+
   get stayNights(): number {
     return this.calculateNights(this.selectedCheckIn, this.selectedCheckOut);
   }
@@ -651,6 +662,11 @@ export class HotelDetailComponent implements OnInit {
 
   bookRoom(room: RoomType): void {
     if (!this.hotel) {
+      return;
+    }
+
+    if (this.isCheckInInPast()) {
+      this.notification.error('Check-in date has already passed. Please select today or a future date.');
       return;
     }
 
@@ -714,6 +730,16 @@ export class HotelDetailComponent implements OnInit {
     return nextDay;
   }
 
+  private isCheckInInPast(): boolean {
+    const checkIn = new Date(this.selectedCheckIn);
+    checkIn.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return checkIn < today;
+  }
+
   private parseDateParam(value: string | null): Date | null {
     if (!value) {
       return null;
@@ -733,7 +759,12 @@ export class HotelDetailComponent implements OnInit {
   private toDateOnly(date: Date): string {
     const local = new Date(date);
     local.setHours(0, 0, 0, 0);
-    return local.toISOString().split('T')[0];
+
+    const year = local.getFullYear();
+    const month = `${local.getMonth() + 1}`.padStart(2, '0');
+    const day = `${local.getDate()}`.padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private calculateNights(checkIn: Date, checkOut: Date): number {
@@ -791,6 +822,10 @@ export class HotelDetailComponent implements OnInit {
 
   private refreshAvailability(): void {
     if (!this.hotel) {
+      return;
+    }
+
+    if (this.isCheckInInPast()) {
       return;
     }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StayEasy.Booking.DTOs;
@@ -10,6 +10,9 @@ namespace StayEasy.Booking.Controllers
     [Route("api/bookings")]
     [ApiController]
     [Authorize]
+    /// <summary>
+    /// Handles HTTP endpoints for BookingController.
+    /// </summary>
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -18,6 +21,9 @@ namespace StayEasy.Booking.Controllers
             _bookingService = bookingService;
         }
         [HttpPost("hold")]
+        /// <summary>
+        /// Creates resources for CreateHold.
+        /// </summary>
         public async Task<IActionResult> CreateHold([FromBody] CreateHoldDto dto)
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -25,18 +31,27 @@ namespace StayEasy.Booking.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
         [HttpGet("hold/{holdId}")]
+        /// <summary>
+        /// Retrieves data for GetHold.
+        /// </summary>
         public async Task<IActionResult> GetHold(Guid holdId)
         {
             var result = await _bookingService.GetHoldAsync(holdId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
         [HttpDelete("hold/{holdId}")]
+        /// <summary>
+        /// Removes or cancels resources via ReleaseHold.
+        /// </summary>
         public async Task<IActionResult> ReleaseHold(Guid holdId)
         {
             var result = await _bookingService.ReleaseHoldAsync(holdId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
         [HttpPost("confirm")]
+        /// <summary>
+        /// Updates state via ConfirmBooking.
+        /// </summary>
         public async Task<IActionResult> ConfirmBooking([FromBody] CreateBookingDto dto)
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -44,6 +59,9 @@ namespace StayEasy.Booking.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
         [HttpPost("{bookingId}/cancel")]
+        /// <summary>
+        /// Removes or cancels resources via CancelBooking.
+        /// </summary>
         public async Task<IActionResult> CancelBooking(Guid bookingId)
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -53,6 +71,9 @@ namespace StayEasy.Booking.Controllers
 
         [HttpPost("{bookingId}/manager-cancel")]
         [Authorize(Roles = "HotelManager")]
+        /// <summary>
+        /// Removes or cancels resources via CancelBookingAsManager.
+        /// </summary>
         public async Task<IActionResult> CancelBookingAsManager(Guid bookingId)
         {
             var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -62,6 +83,9 @@ namespace StayEasy.Booking.Controllers
 
         [HttpPost("{bookingId}/manager-confirm")]
         [Authorize(Roles = "HotelManager")]
+        /// <summary>
+        /// Updates state via ConfirmBookingAsManager.
+        /// </summary>
         public async Task<IActionResult> ConfirmBookingAsManager(Guid bookingId)
         {
             var managerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -70,6 +94,9 @@ namespace StayEasy.Booking.Controllers
         }
 
         [HttpGet("my")]
+        /// <summary>
+        /// Retrieves data for GetMyBookings.
+        /// </summary>
         public async Task<IActionResult> GetMyBookings()
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -77,6 +104,9 @@ namespace StayEasy.Booking.Controllers
             return Ok(result);
         }
         [HttpGet("{bookingId}")]
+        /// <summary>
+        /// Retrieves data for GetBookingById.
+        /// </summary>
         public async Task<IActionResult> GetBookingById(Guid bookingId)
         {
             var travelerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -86,6 +116,9 @@ namespace StayEasy.Booking.Controllers
 
         [HttpGet("incoming")]
         [Authorize(Roles = "HotelManager,Admin")]
+        /// <summary>
+        /// Retrieves data for GetIncomingBookings.
+        /// </summary>
         public async Task<IActionResult> GetIncomingBookings()
         {
             var result = await _bookingService.GetIncomingBookingsAsync();
@@ -94,6 +127,9 @@ namespace StayEasy.Booking.Controllers
 
         [AllowAnonymous]
         [HttpGet("availability")]
+        /// <summary>
+        /// Retrieves data for GetAvailability.
+        /// </summary>
         public async Task<IActionResult> GetAvailability([FromQuery] Guid hotelId, [FromQuery] DateTime checkIn, [FromQuery] DateTime checkOut)
         {
             var result = await _bookingService.GetRoomAvailabilityAsync(hotelId, checkIn, checkOut);

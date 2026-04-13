@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Booking.Models
+namespace StayEasy.Booking.Models
 {
+    /// <summary>
+    /// Represents domain data for HoldRecord.
+    /// </summary>
     public class HoldRecord
     {
         public Guid Id { get; set; } = Guid.NewGuid();

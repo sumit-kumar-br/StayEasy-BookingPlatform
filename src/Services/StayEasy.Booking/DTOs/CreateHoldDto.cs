@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Booking.DTOs
+namespace StayEasy.Booking.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for CreateHoldDto.
+    /// </summary>
     public class CreateHoldDto
     {
         public Guid HotelId { get; set; }

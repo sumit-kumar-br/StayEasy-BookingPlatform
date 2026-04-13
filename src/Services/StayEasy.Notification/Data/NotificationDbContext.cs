@@ -3,6 +3,9 @@ using StayEasy.Notification.Models;
 
 namespace StayEasy.Notification.Data
 {
+    /// <summary>
+    /// Defines persistence configuration for NotificationDbContext.
+    /// </summary>
     public class NotificationDbContext : DbContext
     {
         public NotificationDbContext(DbContextOptions<NotificationDbContext> options) : base(options)

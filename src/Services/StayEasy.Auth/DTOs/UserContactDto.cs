@@ -1,5 +1,8 @@
 namespace StayEasy.Auth.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for UserContactDto.
+    /// </summary>
     public class UserContactDto
     {
         public Guid Id { get; set; }

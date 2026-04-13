@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace StayEasy.Auth.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for AuthResponseDto.
+    /// </summary>
     public class AuthResponseDto
     {
         public Guid UserId { get; set; }

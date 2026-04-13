@@ -1,5 +1,8 @@
 namespace StayEasy.Payment.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for CreateOrderResponseDto.
+    /// </summary>
     public class CreateOrderResponseDto
     {
         public Guid TransactionId { get; set; }

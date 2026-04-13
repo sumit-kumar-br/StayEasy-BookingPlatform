@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Shared.Enums
+namespace StayEasy.Shared.Enums
 {
+    /// <summary>
+    /// Defines BookingStatus.
+    /// </summary>
     public enum BookingStatus
     {
         Pending,

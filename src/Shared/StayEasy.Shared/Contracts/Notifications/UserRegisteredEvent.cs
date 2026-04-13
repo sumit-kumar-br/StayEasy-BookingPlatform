@@ -1,5 +1,8 @@
 namespace StayEasy.Shared.Contracts.Notifications
 {
+    /// <summary>
+    /// Defines UserRegisteredEvent.
+    /// </summary>
     public class UserRegisteredEvent
     {
         public Guid EventId { get; set; } = Guid.NewGuid();

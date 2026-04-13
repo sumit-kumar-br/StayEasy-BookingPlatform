@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Hotel.DTOs
+namespace StayEasy.Hotel.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for CreateHotelDto.
+    /// </summary>
     public class CreateHotelDto
     {
         public string Name { get; set; } = string.Empty;

@@ -7,6 +7,7 @@ using StayEasy.Payment.Services;
 using StayEasy.Shared.JWT;
 
 var builder = WebApplication.CreateBuilder(args);
+// Composition root for the Payment service.
 
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<PaymentDbContext>(options =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+// Messaging pipeline used to publish payment outcome events.
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((_, cfg) =>
@@ -90,6 +92,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    // Ensure payment schema exists for local/dev bootstrap.
     var db = scope.ServiceProvider.GetRequiredService<PaymentDbContext>();
     db.Database.EnsureCreated();
 }
@@ -105,6 +108,7 @@ app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Expose controller endpoints.
 app.MapControllers();
 
 app.Run();

@@ -1,7 +1,10 @@
-﻿using StayEasy.Shared.Enums;
+using StayEasy.Shared.Enums;
 
 namespace StayEasy.Auth.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for RegisterDto.
+    /// </summary>
     public class RegisterDto
     {
         public string FullName { get; set; } = string.Empty;

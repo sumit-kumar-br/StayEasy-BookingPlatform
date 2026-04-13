@@ -1,7 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace StayEasy.Hotel.DTOs
 {
+    /// <summary>
+    /// Represents request and response contracts for CreateRoomTypeDto.
+    /// </summary>
     public class CreateRoomTypeDto
     {
         public string Name { get; set; } = string.Empty;

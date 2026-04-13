@@ -1,4 +1,4 @@
-﻿using CloudinaryDotNet;
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation.Validators;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +14,9 @@ using HotelModel = StayEasy.Hotel.Models.Hotel;
 
 namespace StayEasy.Hotel.Services
 {
+    /// <summary>
+    /// Implements hotel listing operations for managers and admins.
+    /// </summary>
     public class HotelService: IHotelService
     {
         private readonly HotelDbContext _db;
@@ -23,6 +26,10 @@ namespace StayEasy.Hotel.Services
             _db = db;
             _cloudinary = cloudinary;
         }
+
+        /// <summary>
+        /// Creates a new hotel listing in pending-review state.
+        /// </summary>
         public async Task<ApiResponse<HotelResponseDto>> CreateHotelAsync(CreateHotelDto dto, Guid managerId)
         {
             var hotel = new HotelModel
@@ -44,6 +51,9 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<HotelResponseDto>.Ok(MapToDto(hotel));
         }
 
+        /// <summary>
+        /// Fetches a hotel with room-type details.
+        /// </summary>
         public async Task<ApiResponse<HotelResponseDto>> GetHotelByIdAsync(Guid hotelId)
         {
             var hotel = await _db.Hotels.Include(h => h.RoomTypes).FirstOrDefaultAsync(h => h.Id == hotelId);
@@ -55,6 +65,10 @@ namespace StayEasy.Hotel.Services
 
             return ApiResponse<HotelResponseDto>.Ok(MapToDto(hotel));
         }
+
+        /// <summary>
+        /// Lists hotels owned by the requesting manager.
+        /// </summary>
         public async Task<ApiResponse<List<HotelResponseDto>>> GetMyHotelsAsync(Guid managerId)
         {
             var hotels = await _db.Hotels.Include(h => h.RoomTypes)
@@ -63,6 +77,9 @@ namespace StayEasy.Hotel.Services
 
         }
 
+        /// <summary>
+        /// Lists all hotels with latest first ordering.
+        /// </summary>
         public async Task<ApiResponse<List<HotelResponseDto>>> GetAllHotelsAsync()
         {
             var hotels = await _db.Hotels
@@ -73,6 +90,9 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<List<HotelResponseDto>>.Ok(hotels.Select(MapToDto).ToList());
         }
 
+        /// <summary>
+        /// Updates manager-owned hotel profile fields.
+        /// </summary>
         public async Task<ApiResponse<HotelResponseDto>> UpdateHotelAsync(Guid hotelId, UpdateHotelDto dto, Guid managerId)
         {
             var hotel = await _db.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId && h.ManagerId == managerId);
@@ -90,6 +110,10 @@ namespace StayEasy.Hotel.Services
 
             return ApiResponse<HotelResponseDto>.Ok(MapToDto(hotel));
         }
+
+        /// <summary>
+        /// Marks a hotel listing as approved.
+        /// </summary>
         public async Task<ApiResponse<bool>> ApproveHotelAsync(Guid hotelId)
         {
             var hotel = await _db.Hotels.FindAsync(hotelId);
@@ -103,6 +127,9 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<bool>.Ok(true, "Hotel Approved successfully.");
         }
 
+        /// <summary>
+        /// Marks a hotel listing as rejected/suspended.
+        /// </summary>
         public async Task<ApiResponse<bool>> RejectHotelAsync(Guid hotelId)
         {
             var hotel = await _db.Hotels.FindAsync(hotelId);
@@ -118,6 +145,9 @@ namespace StayEasy.Hotel.Services
             return ApiResponse<bool>.Ok(true, "Hotel rejected.");
         }
 
+        /// <summary>
+        /// Uploads and stores a hotel cover photo in Cloudinary.
+        /// </summary>
         public async Task<ApiResponse<bool>> UploadPhotoAsync(Guid hotelId, IFormFile photo, Guid managerId)
         {
             var hotel = await _db.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId && h.ManagerId == managerId);

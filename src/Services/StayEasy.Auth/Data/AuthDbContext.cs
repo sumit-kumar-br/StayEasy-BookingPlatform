@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StayEasy.Auth.Models;
 
 namespace StayEasy.Auth.Data
 {
+    /// <summary>
+    /// Defines persistence configuration for AuthDbContext.
+    /// </summary>
     public class AuthDbContext: DbContext
     {
         public AuthDbContext(DbContextOptions<AuthDbContext> options): base(options) { }

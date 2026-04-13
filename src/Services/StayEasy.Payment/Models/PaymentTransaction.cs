@@ -1,5 +1,8 @@
 namespace StayEasy.Payment.Models
 {
+    /// <summary>
+    /// Represents domain data for PaymentTransaction.
+    /// </summary>
     public class PaymentTransaction
     {
         public Guid Id { get; set; } = Guid.NewGuid();

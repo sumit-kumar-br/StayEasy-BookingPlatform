@@ -1,5 +1,8 @@
-﻿namespace StayEasy.Search.Models
+namespace StayEasy.Search.Models
 {
+    /// <summary>
+    /// Represents domain data for HotelReadModel.
+    /// </summary>
     public class HotelReadModel
     {
         public Guid Id { get; set; }
