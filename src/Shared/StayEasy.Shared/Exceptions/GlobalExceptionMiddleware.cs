@@ -29,6 +29,10 @@ namespace StayEasy.Shared.Exceptions
             {
                 await WriteResponse(context, HttpStatusCode.NotFound, ex.Message);
             }
+            catch (UnauthorizedException ex)
+            {
+                await WriteResponse(context, HttpStatusCode.Forbidden, ex.Message);
+            }
         }
         private static async Task WriteResponse(HttpContext context, HttpStatusCode statusCode, string message)
         {

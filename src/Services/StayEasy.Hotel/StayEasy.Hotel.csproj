@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Repositories\**" />
+    <Content Remove="Data\Repositories\**" />
+    <EmbeddedResource Remove="Data\Repositories\**" />
+    <None Remove="Data\Repositories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CloudinaryDotnet" Version="1.28.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">

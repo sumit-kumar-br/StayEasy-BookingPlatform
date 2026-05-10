@@ -24,6 +24,8 @@ public class BookingServiceTests
         var travelerId = Guid.NewGuid();
         var hotelId = Guid.NewGuid();
         var roomTypeId = Guid.NewGuid();
+        var checkIn = DateTime.UtcNow.Date.AddDays(10);
+        var checkOut = checkIn.AddDays(2);
 
         context.HoldRecords.Add(new HoldRecord
         {
@@ -33,8 +35,8 @@ public class BookingServiceTests
             RoomTypeId = roomTypeId,
             HotelName = "Grand Palace",
             RoomTypeName = "Deluxe Suite",
-            CheckIn = new DateTime(2026, 4, 10),
-            CheckOut = new DateTime(2026, 4, 12),
+            CheckIn = checkIn,
+            CheckOut = checkOut,
             Guests = 2,
             TotalAmount = 5500m,
             ExpiresAt = DateTime.UtcNow.AddMinutes(10),
@@ -98,6 +100,8 @@ public class BookingServiceTests
         using var context = CreateDbContext();
         var holdId = Guid.NewGuid();
         var travelerId = Guid.NewGuid();
+        var checkIn = DateTime.UtcNow.Date.AddDays(10);
+        var checkOut = checkIn.AddDays(2);
 
         context.HoldRecords.Add(new HoldRecord
         {
@@ -107,8 +111,8 @@ public class BookingServiceTests
             RoomTypeId = Guid.NewGuid(),
             HotelName = "Grand Palace",
             RoomTypeName = "Deluxe Suite",
-            CheckIn = new DateTime(2026, 4, 10),
-            CheckOut = new DateTime(2026, 4, 12),
+            CheckIn = checkIn,
+            CheckOut = checkOut,
             Guests = 2,
             TotalAmount = 5500m,
             ExpiresAt = DateTime.UtcNow.AddMinutes(-1),
