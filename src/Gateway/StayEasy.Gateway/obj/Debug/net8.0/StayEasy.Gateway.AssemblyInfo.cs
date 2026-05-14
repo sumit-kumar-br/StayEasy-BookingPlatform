@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StayEasy.Gateway")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7567ab48427688269dd6bad09833a63429afbbc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b5a3e1f01bdb1815c61bac66456b45feceaacd8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("StayEasy.Gateway")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StayEasy.Gateway")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

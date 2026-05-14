@@ -154,10 +154,12 @@ import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner
         display: grid;
         gap: 16px;
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        align-items: end;
+        align-items: stretch;
       }
 
       .search-btn {
+        width: 100%;
+        align-self: stretch;
         min-height: 56px;
         border-radius: 8px;
         font-weight: 600;
